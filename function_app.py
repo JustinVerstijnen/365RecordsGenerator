@@ -14,29 +14,33 @@ def m365_dns_generator(req: func.HttpRequest) -> func.HttpResponse:
                 font-family: 'Segoe UI', sans-serif;
                 background: #f4f6f8;
                 padding: 2em;
-                max-width: 900px;
+                max-width: 1000px;
                 margin: auto;
             }
-            h2 {
-                color: #333;
-                text-align: center;
-            }
-            input, button {
-                padding: 0.6em;
-                font-size: 1em;
-                margin: 0.5em 0;
-                border: 1px solid #ccc;
-                border-radius: 4px;
+            table {
                 width: 100%;
+                border-collapse: collapse;
+                margin-top: 2em;
+            }
+            th, td {
+                border: 1px solid #ccc;
+                padding: 0.6em;
+                text-align: left;
+            }
+            th {
+                background-color: #e0e0e0;
+            }
+            input, select {
+                width: 100%;
+                padding: 0.4em;
                 box-sizing: border-box;
             }
-            button {
-                background-color: #88B0DC;
-                color: white;
-                cursor: pointer;
+            input[type="date"] {
+                min-width: 150px;
             }
-            button:hover {
-                background-color: #005A9E;
+            .greyed {
+                color: #999;
+                font-style: italic;
             }
             .section {
                 background: white;
@@ -45,102 +49,144 @@ def m365_dns_generator(req: func.HttpRequest) -> func.HttpResponse:
                 margin-top: 2em;
                 box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             }
-            table {
-                width: 100%;
-                border-collapse: collapse;
-                margin-top: 1em;
-            }
-            th, td {
-                border: 1px solid #ccc;
+            button {
                 padding: 0.6em;
-                text-align: left;
-            }
-            th {
-                background-color: #f0f0f0;
-            }
-            .logo {
-                text-align: center;
-                margin-bottom: 1em;
+                font-size: 1em;
+                background-color: #88B0DC;
+                border: none;
+                color: white;
+                border-radius: 4px;
+                margin-top: 1em;
+                cursor: pointer;
             }
         </style>
     </head>
     <body>
-        <div class="logo">
-            <a href="https://justinverstijnen.nl" target="_blank">
-                <img src="https://justinverstijnen.nl/wp-content/uploads/2025/04/cropped-Logo-2.0-Transparant.png" alt="Logo" style="height:50px;" />
-            </a>
-        </div>
-
         <h2>Microsoft 365 DNS Record Generator</h2>
-        <p style="text-align:center;">Vul hieronder je domeinnaam en M365 tenant in, en alle benodigde records worden weergegeven in een tabel.</p>
-
         <div class="section">
-            <label>Domeinnaam (bijv. voorbeeld.nl):</label>
-            <input type="text" id="domain" placeholder="example.nl" />
-
-            <label>Microsoft 365 Tenant (bijv. justinverstijnen of justinverstijnen.onmicrosoft.com):</label>
-            <input type="text" id="tenant" placeholder="justinverstijnen" />
-
-            <button onclick="generate()">Genereer DNS-records</button>
+            <label>Domeinnaam:</label>
+            <input type="text" id="domain" placeholder="voorbeeld.nl">
+            <label>Tenantnaam:</label>
+            <input type="text" id="tenant" placeholder="exampletenant">
 
             <div id="output"></div>
         </div>
 
         <script>
-            function generate() {
+            function generateTable() {
                 const domain = document.getElementById("domain").value.trim();
                 let tenant = document.getElementById("tenant").value.trim();
-
                 if (!domain || !tenant) {
                     alert("Vul zowel domeinnaam als tenantnaam in.");
                     return;
                 }
-
                 const domainClean = domain.replace(/\\./g, "-");
                 if (!tenant.endsWith(".onmicrosoft.com")) {
                     tenant += ".onmicrosoft.com";
                 }
 
-                const records = [
-                    { techniek: "Microsoft 365", record: "@ (MX)", extra: `${domainClean}.mail.protection.outlook.com` },
-                    { techniek: "Microsoft 365", record: "@ (TXT - SPF)", extra: `v=spf1 include:spf.protection.outlook.com -all` },
-                    { techniek: "Microsoft 365", record: "_dmarc (TXT)", extra: `v=DMARC1; p=quarantine;` },
-                    { techniek: "Microsoft 365", record: "autodiscover (CNAME)", extra: `autodiscover.outlook.com` },
-                    { techniek: "Microsoft 365", record: "selector1._domainkey (CNAME)", extra: `selector1-${domainClean}._domainkey.${tenant}` },
-                    { techniek: "Microsoft 365", record: "selector2._domainkey (CNAME)", extra: `selector2-${domainClean}._domainkey.${tenant}` },
-                ];
+                const dkim1 = `selector1-${domainClean}._domainkey.${tenant}`;
+                const dkim2 = `selector2-${domainClean}._domainkey.${tenant}`;
 
-                let tableHTML = `
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Techniek</th>
-                                <th>Aan te maken record</th>
-                                <th>Extra opties</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                `;
-
-                records.forEach(rec => {
-                    tableHTML += `
+                const table = `
+                <table>
+                    <thead>
                         <tr>
-                            <td>${rec.techniek}</td>
-                            <td>${rec.record}</td>
-                            <td>${rec.extra}</td>
+                            <th>Techniek</th>
+                            <th>Type record</th>
+                            <th>Waarde</th>
+                            <th>Extra opties</th>
                         </tr>
-                    `;
-                });
-
-                tableHTML += `
-                        </tbody>
-                    </table>
-                    <p><strong>TTL:</strong> 3600 seconden (of gebruik provider-standaard).<br>
-                    Controleer ook het Microsoft 365 admin center voor aanvullende verificatie-records.</p>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>MX</td>
+                            <td>MX</td>
+                            <td>${domainClean}.mail.protection.outlook.com</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>SPF</td>
+                            <td>TXT</td>
+                            <td>v=spf1 include:spf.protection.outlook.com -all</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>DKIM</td>
+                            <td>CNAME</td>
+                            <td>${dkim1}</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>DKIM</td>
+                            <td>CNAME</td>
+                            <td>${dkim2}</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>DMARC</td>
+                            <td>TXT</td>
+                            <td id="dmarc-value">v=DMARC1; p=quarantine;</td>
+                            <td>
+                                Beleid:
+                                <select id="dmarc-policy" onchange="updateDMARC()">
+                                    <option value="none">none</option>
+                                    <option value="quarantine" selected>quarantine</option>
+                                    <option value="reject">reject</option>
+                                </select><br/>
+                                RUA e-mail: <input id="dmarc-rua" type="email" placeholder="rua@example.nl" oninput="updateDMARC()"><br/>
+                                RUF e-mail: <input id="dmarc-ruf" type="email" placeholder="ruf@example.nl" oninput="updateDMARC()">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>MTA-STS</td>
+                            <td>TXT</td>
+                            <td id="mta-sts-value">v=STS; id=</td>
+                            <td>
+                                Datum-ID:
+                                <input type="date" id="mta-date" onchange="updateMTASTS()"><br/>
+                                RUA e-mail: <input id="mta-rua" type="email" placeholder="reports@example.nl" oninput="updateMTASTS()">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>SMTP DANE</td>
+                            <td>TLSA</td>
+                            <td class="greyed">Wordt handmatig opgehaald vanuit je mailservercertificaat</td>
+                            <td class="greyed">Geen actie nodig hier</td>
+                        </tr>
+                    </tbody>
+                </table>
                 `;
 
-                document.getElementById("output").innerHTML = tableHTML;
+                document.getElementById("output").innerHTML = table;
             }
+
+            function updateDMARC() {
+                const policy = document.getElementById("dmarc-policy").value;
+                const rua = document.getElementById("dmarc-rua").value;
+                const ruf = document.getElementById("dmarc-ruf").value;
+
+                let record = `v=DMARC1; p=${policy}`;
+                if (rua) record += `; rua=mailto:${rua}`;
+                if (ruf) record += `; ruf=mailto:${ruf}`;
+                document.getElementById("dmarc-value").innerText = record;
+            }
+
+            function updateMTASTS() {
+                const date = document.getElementById("mta-date").value;
+                const rua = document.getElementById("mta-rua").value;
+
+                let record = `v=STS; id=${date}`;
+                if (rua) record += `; rua=mailto:${rua}`;
+                document.getElementById("mta-sts-value").innerText = record;
+            }
+
+            document.addEventListener("DOMContentLoaded", () => {
+                const button = document.createElement("button");
+                button.innerText = "Genereer DNS-records";
+                button.onclick = generateTable;
+                document.querySelector(".section").appendChild(button);
+            });
         </script>
     </body>
     </html>
