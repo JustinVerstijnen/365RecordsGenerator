@@ -9,7 +9,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     <html lang="nl">
     <head>
         <meta charset="UTF-8">
-        <title>Microsoft 365 DNS Generator</title>
+        <title>M365 DNS Generator - justinverstijnen.nl</title>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
         <style>
@@ -70,22 +70,22 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         </style>
     </head>
     <body>
-        <h2>Microsoft 365 DNS Record Generator</h2>
+        <h2>M365 DNS Generator</h2>
         <div class="section">
-            <label>Domeinnaam:</label>
-            <input type="text" id="domain" placeholder="voorbeeld.nl">
-            <label>Microsoft 365 Tenant:</label>
-            <input type="text" id="tenant" placeholder="voorbeeld of voorbeeld.onmicrosoft.com">
-            <button onclick="generateTable()"><i class="fas fa-cogs"></i> Genereer DNS-records</button>
+            <label>Step 1 :Domain</label>
+            <input type="text" id="domain" placeholder="example.com">
+            <label>Step 2: Microsoft 365 Tenant name:</label>
+            <input type="text" id="tenant" placeholder="example.onmicrosoft.com">
+            <button onclick="generateTable()"><i class="fas fa-cogs"></i> Generate DNS-records</button>
             <div id="output"></div>
-            <button class="export-btn" onclick="downloadPDF()"><i class="fas fa-file-pdf"></i> Exporteer als PDF</button>
+            <button class="export-btn" onclick="downloadPDF()"><i class="fas fa-file-pdf"></i> Export to PDF</button>
         </div>
 
         <script>
             function generateTable() {
                 const domain = document.getElementById("domain").value.trim();
                 let tenant = document.getElementById("tenant").value.trim();
-                if (!domain || !tenant) return alert("Vul zowel domein als tenant in.");
+                if (!domain || !tenant) return alert("Fill in both field to get correct records.");
                 const clean = domain.replace(/\\./g, "-");
                 if (!tenant.endsWith(".onmicrosoft.com")) tenant += ".onmicrosoft.com";
                 const dkim1 = `selector1-${clean}._domainkey.${tenant}`;
@@ -94,7 +94,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                 const table = `
                 <table id="dns-table">
                     <thead>
-                        <tr><th>Techniek</th><th>Type record</th><th>Waarde</th><th>Extra opties</th></tr>
+                        <tr><th>Configuration</th><th>Type</th><th>Value</th><th>More options</th></tr>
                     </thead>
                     <tbody>
                         <tr>
