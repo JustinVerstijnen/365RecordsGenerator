@@ -3,12 +3,12 @@ import azure.functions as func
 app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
 
 @app.route(route="/", methods=["GET"], auth_level=func.AuthLevel.ANONYMOUS)
-def generate_dns_records(req: func.HttpRequest) -> func.HttpResponse:
+def m365_dns_generator(req: func.HttpRequest) -> func.HttpResponse:
     html = """
     <!DOCTYPE html>
     <html>
     <head>
-        <title>DNS Record Generator - justinverstijnen.nl</title>
+        <title>Microsoft 365 DNS Generator</title>
         <style>
             body {
                 font-family: 'Segoe UI', sans-serif;
@@ -21,17 +21,14 @@ def generate_dns_records(req: func.HttpRequest) -> func.HttpResponse:
                 color: #333;
                 text-align: center;
             }
-            input, select, textarea, button {
+            input, button {
                 padding: 0.6em;
                 font-size: 1em;
-                margin: 0.4em 0;
+                margin: 0.5em 0;
                 border: 1px solid #ccc;
                 border-radius: 4px;
                 width: 100%;
                 box-sizing: border-box;
-            }
-            textarea {
-                resize: vertical;
             }
             button {
                 background-color: #88B0DC;
@@ -45,14 +42,13 @@ def generate_dns_records(req: func.HttpRequest) -> func.HttpResponse:
                 background: white;
                 padding: 1.5em;
                 border-radius: 8px;
-                margin-bottom: 2em;
+                margin-top: 2em;
                 box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             }
             pre {
                 background: #eef;
                 padding: 1em;
                 border-radius: 6px;
-                overflow-x: auto;
                 white-space: pre-wrap;
             }
             .logo {
@@ -68,64 +64,65 @@ def generate_dns_records(req: func.HttpRequest) -> func.HttpResponse:
             </a>
         </div>
 
-        <h2>DNS Record Generator</h2>
-        <p style="text-align:center;">Generate SPF, DKIM, and DMARC records for your domain below.</p>
+        <h2>Microsoft 365 DNS Record Generator</h2>
+        <p style="text-align:center;">Vul hieronder je domeinnaam en M365 tenant in, en alle benodigde records worden gegenereerd.</p>
 
         <div class="section">
-            <h3>SPF Record</h3>
-            <label>Allowed sources (e.g. ip4:192.0.2.0/24 include:_spf.google.com):</label>
-            <input type="text" id="spfSources" placeholder="e.g. ip4:192.0.2.0/24 include:_spf.google.com" />
-            <button onclick="generateSPF()">Generate SPF</button>
-            <pre id="spfResult"></pre>
-        </div>
+            <label>Domeinnaam (bijv. voorbeeld.nl):</label>
+            <input type="text" id="domain" placeholder="example.nl" />
 
-        <div class="section">
-            <h3>DMARC Record</h3>
-            <label>Policy (p=):</label>
-            <select id="dmarcPolicy">
-                <option value="none">none</option>
-                <option value="quarantine">quarantine</option>
-                <option value="reject" selected>reject</option>
-            </select>
-            <label>Aggregate Report Email (rua):</label>
-            <input type="email" id="dmarcRua" placeholder="mailto:postmaster@example.com" />
-            <button onclick="generateDMARC()">Generate DMARC</button>
-            <pre id="dmarcResult"></pre>
-        </div>
+            <label>Microsoft 365 Tenant (bijv. justinverstijnen of justinverstijnen.onmicrosoft.com):</label>
+            <input type="text" id="tenant" placeholder="justinverstijnen" />
 
-        <div class="section">
-            <h3>DKIM Record</h3>
-            <label>Selector:</label>
-            <input type="text" id="dkimSelector" placeholder="e.g. default" />
-            <label>Public Key:</label>
-            <textarea id="dkimKey" rows="5" placeholder="Paste your DKIM public key here..."></textarea>
-            <button onclick="generateDKIM()">Generate DKIM</button>
-            <pre id="dkimResult"></pre>
+            <button onclick="generate()">Genereer DNS-records</button>
+
+            <pre id="output"></pre>
         </div>
 
         <script>
-            function generateSPF() {
-                const sources = document.getElementById("spfSources").value.trim();
-                if (!sources) return alert("Please enter SPF sources.");
-                const result = `v=spf1 ${sources} -all`;
-                document.getElementById("spfResult").innerText = result;
-            }
+            function generate() {
+                const domainInput = document.getElementById("domain").value.trim();
+                let tenantInput = document.getElementById("tenant").value.trim();
 
-            function generateDMARC() {
-                const policy = document.getElementById("dmarcPolicy").value;
-                const rua = document.getElementById("dmarcRua").value.trim();
-                if (!rua.startsWith("mailto:")) return alert("DMARC rua must start with 'mailto:'");
-                const result = `v=DMARC1; p=${policy}; rua=${rua}; sp=${policy}; adkim=s; aspf=s`;
-                document.getElementById("dmarcResult").innerText = result;
-            }
+                if (!domainInput || !tenantInput) {
+                    alert("Vul zowel domeinnaam als tenantnaam in.");
+                    return;
+                }
 
-            function generateDKIM() {
-                const selector = document.getElementById("dkimSelector").value.trim();
-                const key = document.getElementById("dkimKey").value.trim().replace(/\\n/g, "").replace(/\\r/g, "");
-                if (!selector || !key) return alert("Please fill in both selector and public key.");
-                const recordName = `${selector}._domainkey`;
-                const recordValue = `v=DKIM1; k=rsa; p=${key}`;
-                document.getElementById("dkimResult").innerText = `Record Name: ${recordName}\nRecord Value: ${recordValue}`;
+                const domainClean = domainInput.replace(/\\./g, "-");
+                if (!tenantInput.endsWith(".onmicrosoft.com")) {
+                    tenantInput += ".onmicrosoft.com";
+                }
+
+                const mx = `@                       ${domainClean}.mail.protection.outlook.com`;
+                const spf = `@                       v=spf1 include:spf.protection.outlook.com -all`;
+                const dmarc = `_dmarc                  v=DMARC1; p=quarantine;`;
+                const cname1 = `autodiscover            autodiscover.outlook.com`;
+                const dkim1 = `selector1._domainkey    selector1-${domainClean}._domainkey.${tenantInput}`;
+                const dkim2 = `selector2._domainkey    selector2-${domainClean}._domainkey.${tenantInput}`;
+
+                const output = `
+De volgende DNS-records moeten worden aangemaakt:
+
+----------------------------------------
+MX-record
+${mx}
+----------------------------------------
+TXT-records
+${spf}
+${dmarc}
+----------------------------------------
+CNAME-records
+${cname1}
+${dkim1}
+${dkim2}
+----------------------------------------
+TTL: 3600 seconden (of gebruik de provider-standaard)
+Controleer ook het Microsoft 365 admin center voor de verificatie-record.
+✅ Succes!
+                `.trim();
+
+                document.getElementById("output").innerText = output;
             }
         </script>
     </body>
