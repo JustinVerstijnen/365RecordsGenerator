@@ -3,12 +3,15 @@ import azure.functions as func
 app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
 
 @app.route(route="/", methods=["GET"], auth_level=func.AuthLevel.ANONYMOUS)
-def m365_dns_generator(req: func.HttpRequest) -> func.HttpResponse:
+def main(req: func.HttpRequest) -> func.HttpResponse:
     html = """
     <!DOCTYPE html>
-    <html>
+    <html lang="nl">
     <head>
+        <meta charset="UTF-8">
         <title>Microsoft 365 DNS Generator</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
         <style>
             body {
                 font-family: 'Segoe UI', sans-serif;
@@ -17,30 +20,30 @@ def m365_dns_generator(req: func.HttpRequest) -> func.HttpResponse:
                 max-width: 1000px;
                 margin: auto;
             }
-            table {
-                width: 100%;
-                border-collapse: collapse;
-                margin-top: 2em;
+            h2 {
+                color: #333;
+                text-align: center;
             }
-            th, td {
-                border: 1px solid #ccc;
+            input, select, button {
                 padding: 0.6em;
-                text-align: left;
-            }
-            th {
-                background-color: #e0e0e0;
-            }
-            input, select {
-                width: 100%;
-                padding: 0.4em;
+                font-size: 1em;
+                margin: 0.4em 0;
+                border: 1px solid #ccc;
+                border-radius: 4px;
                 box-sizing: border-box;
             }
-            input[type="date"] {
-                min-width: 150px;
+            button {
+                background-color: #005A9E;
+                color: white;
+                cursor: pointer;
+                border: none;
             }
-            .greyed {
-                color: #999;
-                font-style: italic;
+            button:hover {
+                background-color: #003f6d;
+            }
+            .export-btn {
+                background-color: #4CAF50;
+                margin-top: 1em;
             }
             .section {
                 background: white;
@@ -49,15 +52,20 @@ def m365_dns_generator(req: func.HttpRequest) -> func.HttpResponse:
                 margin-top: 2em;
                 box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             }
-            button {
-                padding: 0.6em;
-                font-size: 1em;
-                background-color: #88B0DC;
-                border: none;
-                color: white;
-                border-radius: 4px;
+            table {
+                width: 100%;
+                border-collapse: collapse;
                 margin-top: 1em;
-                cursor: pointer;
+            }
+            table th, table td {
+                padding: 0.6em;
+                border: 1px solid #ddd;
+                text-align: left;
+                vertical-align: top;
+            }
+            .greyed {
+                color: #888;
+                font-style: italic;
             }
         </style>
     </head>
@@ -66,127 +74,123 @@ def m365_dns_generator(req: func.HttpRequest) -> func.HttpResponse:
         <div class="section">
             <label>Domeinnaam:</label>
             <input type="text" id="domain" placeholder="voorbeeld.nl">
-            <label>Tenantnaam:</label>
-            <input type="text" id="tenant" placeholder="exampletenant">
-
+            <label>Microsoft 365 Tenant:</label>
+            <input type="text" id="tenant" placeholder="voorbeeld of voorbeeld.onmicrosoft.com">
+            <button onclick="generateTable()"><i class="fas fa-cogs"></i> Genereer DNS-records</button>
             <div id="output"></div>
+            <button class="export-btn" onclick="downloadPDF()"><i class="fas fa-file-pdf"></i> Exporteer als PDF</button>
         </div>
 
         <script>
             function generateTable() {
                 const domain = document.getElementById("domain").value.trim();
                 let tenant = document.getElementById("tenant").value.trim();
-                if (!domain || !tenant) {
-                    alert("Vul zowel domeinnaam als tenantnaam in.");
-                    return;
-                }
-                const domainClean = domain.replace(/\\./g, "-");
-                if (!tenant.endsWith(".onmicrosoft.com")) {
-                    tenant += ".onmicrosoft.com";
-                }
-
-                const dkim1 = `selector1-${domainClean}._domainkey.${tenant}`;
-                const dkim2 = `selector2-${domainClean}._domainkey.${tenant}`;
+                if (!domain || !tenant) return alert("Vul zowel domein als tenant in.");
+                const clean = domain.replace(/\\./g, "-");
+                if (!tenant.endsWith(".onmicrosoft.com")) tenant += ".onmicrosoft.com";
+                const dkim1 = `selector1-${clean}._domainkey.${tenant}`;
+                const dkim2 = `selector2-${clean}._domainkey.${tenant}`;
 
                 const table = `
-                <table>
+                <table id="dns-table">
                     <thead>
-                        <tr>
-                            <th>Techniek</th>
-                            <th>Type record</th>
-                            <th>Waarde</th>
-                            <th>Extra opties</th>
-                        </tr>
+                        <tr><th>Techniek</th><th>Type record</th><th>Waarde</th><th>Extra opties</th></tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td>MX</td>
-                            <td>MX</td>
-                            <td>${domainClean}.mail.protection.outlook.com</td>
+                            <td>MX</td><td>MX</td>
+                            <td><span id="mx">${clean}.mail.protection.outlook.com</span> <button onclick="copy('mx')">📋</button></td>
                             <td></td>
                         </tr>
                         <tr>
-                            <td>SPF</td>
-                            <td>TXT</td>
-                            <td>v=spf1 include:spf.protection.outlook.com -all</td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td>DKIM</td>
-                            <td>CNAME</td>
-                            <td>${dkim1}</td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td>DKIM</td>
-                            <td>CNAME</td>
-                            <td>${dkim2}</td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td>DMARC</td>
-                            <td>TXT</td>
-                            <td id="dmarc-value">v=DMARC1; p=quarantine;</td>
+                            <td>SPF</td><td>TXT</td>
+                            <td><span id="spf">v=spf1 include:spf.protection.outlook.com -all</span> <button onclick="copy('spf')">📋</button></td>
                             <td>
-                                Beleid:
+                                <select id="spf-policy" onchange="updateSPF()">
+                                    <option value="-all" selected>Hardfail (-all)</option>
+                                    <option value="~all">Softfail (~all)</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>DKIM</td><td>CNAME</td>
+                            <td><span id="dkim1">${dkim1}</span> <button onclick="copy('dkim1')">📋</button></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>DKIM</td><td>CNAME</td>
+                            <td><span id="dkim2">${dkim2}</span> <button onclick="copy('dkim2')">📋</button></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>DMARC</td><td>TXT</td>
+                            <td><span id="dmarc">v=DMARC1; p=reject</span> <button onclick="copy('dmarc')">📋</button></td>
+                            <td>
                                 <select id="dmarc-policy" onchange="updateDMARC()">
                                     <option value="none">none</option>
-                                    <option value="quarantine" selected>quarantine</option>
-                                    <option value="reject">reject</option>
+                                    <option value="quarantine">quarantine</option>
+                                    <option value="reject" selected>reject</option>
                                 </select><br/>
-                                RUA e-mail: <input id="dmarc-rua" type="email" placeholder="rua@example.nl" oninput="updateDMARC()"><br/>
-                                RUF e-mail: <input id="dmarc-ruf" type="email" placeholder="ruf@example.nl" oninput="updateDMARC()">
+                                RUA: <input id="rua" type="email" oninput="updateDMARC()" placeholder="rua@..."><br/>
+                                RUF: <input id="ruf" type="email" oninput="updateDMARC()" placeholder="ruf@...">
                             </td>
                         </tr>
                         <tr>
-                            <td>MTA-STS</td>
-                            <td>TXT</td>
-                            <td id="mta-sts-value">v=STS; id=</td>
+                            <td>MTA-STS</td><td>TXT</td>
+                            <td><span id="mta-sts">v=STS;</span> <button onclick="copy('mta-sts')">📋</button></td>
                             <td>
-                                Datum-ID:
-                                <input type="date" id="mta-date" onchange="updateMTASTS()"><br/>
-                                RUA e-mail: <input id="mta-rua" type="email" placeholder="reports@example.nl" oninput="updateMTASTS()">
+                                Datum-ID: <input type="date" id="mta-date" onchange="updateMTASTS()"><br/>
+                                RUA: <input id="mta-rua" type="email" oninput="updateMTASTS()" placeholder="rua@...">
                             </td>
                         </tr>
                         <tr>
-                            <td>SMTP DANE</td>
-                            <td>TLSA</td>
-                            <td class="greyed">Wordt handmatig opgehaald vanuit je mailservercertificaat</td>
-                            <td class="greyed">Geen actie nodig hier</td>
+                            <td>SMTP DANE</td><td>TLSA</td>
+                            <td class="greyed">Wordt handmatig opgehaald via TLS-certificaat</td>
+                            <td class="greyed">Geen actie nodig</td>
                         </tr>
                     </tbody>
-                </table>
-                `;
-
+                </table>`;
                 document.getElementById("output").innerHTML = table;
             }
 
-            function updateDMARC() {
-                const policy = document.getElementById("dmarc-policy").value;
-                const rua = document.getElementById("dmarc-rua").value;
-                const ruf = document.getElementById("dmarc-ruf").value;
+            function updateSPF() {
+                const pol = document.getElementById("spf-policy").value;
+                document.getElementById("spf").innerText = `v=spf1 include:spf.protection.outlook.com ${pol}`;
+            }
 
-                let record = `v=DMARC1; p=${policy}`;
-                if (rua) record += `; rua=mailto:${rua}`;
-                if (ruf) record += `; ruf=mailto:${ruf}`;
-                document.getElementById("dmarc-value").innerText = record;
+            function updateDMARC() {
+                const p = document.getElementById("dmarc-policy").value;
+                const rua = document.getElementById("rua").value;
+                const ruf = document.getElementById("ruf").value;
+                let r = `v=DMARC1; p=${p}`;
+                if (rua) r += `; rua=mailto:${rua}`;
+                if (ruf) r += `; ruf=mailto:${ruf}`;
+                document.getElementById("dmarc").innerText = r;
             }
 
             function updateMTASTS() {
                 const date = document.getElementById("mta-date").value;
                 const rua = document.getElementById("mta-rua").value;
-
-                let record = `v=STS; id=${date}`;
-                if (rua) record += `; rua=mailto:${rua}`;
-                document.getElementById("mta-sts-value").innerText = record;
+                let r = "v=STS;";
+                if (date) r += ` id=${date.replace(/-/g,"")}000000Z`;
+                if (rua) r += `; rua=mailto:${rua}`;
+                document.getElementById("mta-sts").innerText = r;
             }
 
-            document.addEventListener("DOMContentLoaded", () => {
-                const button = document.createElement("button");
-                button.innerText = "Genereer DNS-records";
-                button.onclick = generateTable;
-                document.querySelector(".section").appendChild(button);
-            });
+            function copy(id) {
+                const val = document.getElementById(id).innerText;
+                navigator.clipboard.writeText(val).then(() => alert("Gekopieerd: " + val));
+            }
+
+            function downloadPDF() {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                doc.text("Microsoft 365 DNS Records", 14, 14);
+                const table = document.getElementById("dns-table");
+                if (!table) return alert("Genereer eerst een tabel.");
+                doc.autoTable({ html: "#dns-table", startY: 20 });
+                doc.save("M365-DNS-records.pdf");
+            }
         </script>
     </body>
     </html>
