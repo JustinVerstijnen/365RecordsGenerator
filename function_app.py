@@ -1,8 +1,10 @@
 import datetime
 import dns.resolver
 import dns.exception
-import azure.functions as func
-from azure.functions import HttpRequest, HttpResponse
+from azure.functions import HttpRequest, HttpResponse, App
+from jinja2 import Template
+
+app = App()
 
 HTML_TEMPLATE = """
 <!DOCTYPE html>
@@ -53,11 +55,6 @@ HTML_TEMPLATE = """
 </html>
 """
 
-from jinja2 import Template
-from azure.functions import App
-
-app = App()
-
 def check_dnssec(domain: str) -> bool:
     try:
         dns.resolver.resolve(domain, 'DNSKEY')
@@ -68,6 +65,7 @@ def check_dnssec(domain: str) -> bool:
 @app.function_name(name="DnsChecker")
 @app.route(route="dnscheck", methods=["GET", "POST"])
 def dns_checker(req: HttpRequest) -> HttpResponse:
+    formdata = req.get_body().decode()
     domain = req.form.get("domain") or req.params.get("domain") or ""
     tenant = req.form.get("tenant") or req.params.get("tenant") or ""
     records = []
@@ -85,7 +83,5 @@ def dns_checker(req: HttpRequest) -> HttpResponse:
             {"type": "DNSSEC", "value": "✅ DNSSEC aanwezig" if dnssec else "❌ DNSSEC niet gevonden"},
         ]
 
-    template = Template(HTML_TEMPLATE)
-    html = template.render(domain=domain, tenant=tenant, records=records)
-
-    return HttpResponse(html, mimetype="text/html")
+    rendered_html = Template(HTML_TEMPLATE).render(domain=domain, tenant=tenant, records=records)
+    return HttpResponse(rendered_html, mimetype="text/html")
