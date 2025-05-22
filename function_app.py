@@ -181,7 +181,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                             </tr>
                             <tr>
                                 <td>MTA-STS</td><td>TXT</td>
-                                <td><button class="copy-btn" onclick="copy('mta-sts')">📋</button><span id="mta-sts">v=STSv1;</span></td>
+                                <td><button class="copy-btn" onclick="copy('mta-sts')">📋</button><span id="mta-sts">v=STS;</span></td>
                                 <td>
                                     ID: <input type="date" id="mta-date" onchange="updateMTASTS()"><br/>
                                     RUA: <input id="mta-rua" type="email" oninput="updateMTASTS()" placeholder="rua@...">
@@ -215,7 +215,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             function updateMTASTS() {{
                 const date = document.getElementById("mta-date").value;
                 const rua = document.getElementById("mta-rua").value;
-                let r = "v=STSv1;";
+                let r = "v=STS;";
                 if (date) r += ` id=${{date.replace(/-/g,"")}}000000Z`;
                 if (rua) r += `; rua=mailto:${{rua}}`;
                 document.getElementById("mta-sts").innerText = r;
