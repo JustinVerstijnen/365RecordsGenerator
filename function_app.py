@@ -1,17 +1,10 @@
 import azure.functions as func
 import dns.resolver
-import dns.dnssec
-import dns.name
-import dns.message
-import dns.query
-import dns.rdatatype
 
 app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
 
 def is_dnssec_enabled(domain):
     try:
-        # Verkrijg DNSKEY van domein
-        name = dns.name.from_text(domain)
         response = dns.resolver.resolve(domain, 'DNSKEY', raise_on_no_answer=False)
         return bool(response.rrset)
     except Exception:
@@ -181,7 +174,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                             </tr>
                             <tr>
                                 <td>MTA-STS</td><td>TXT</td>
-                                <td><button class="copy-btn" onclick="copy('mta-sts')">📋</button><span id="mta-sts">v=STS;</span></td>
+                                <td><button class="copy-btn" onclick="copy('mta-sts')">📋</button><span id="mta-sts">v=STSv1;</span></td>
                                 <td>
                                     ID: <input type="date" id="mta-date" onchange="updateMTASTS()"><br/>
                                     RUA: <input id="mta-rua" type="email" oninput="updateMTASTS()" placeholder="rua@...">
@@ -215,7 +208,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             function updateMTASTS() {{
                 const date = document.getElementById("mta-date").value;
                 const rua = document.getElementById("mta-rua").value;
-                let r = "v=STS;";
+                let r = "v=STSv1;";
                 if (date) r += ` id=${{date.replace(/-/g,"")}}000000Z`;
                 if (rua) r += `; rua=mailto:${{rua}}`;
                 document.getElementById("mta-sts").innerText = r;
