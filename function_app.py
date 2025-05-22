@@ -10,13 +10,15 @@ def is_dnssec_enabled(domain):
     except Exception:
         return False
 
-@app.route(route="/", methods=["GET"], auth_level=func.AuthLevel.ANONYMOUS)
+@app.route(route="/", methods=["GET"])
 def main(req: func.HttpRequest) -> func.HttpResponse:
     domain = req.params.get("checkdomain")
     dane_result = ""
     if domain:
-        is_dnssec = is_dnssec_enabled(domain)
-        dane_result = "DNSSEC is enabled ✅ — DANE can be configured" if is_dnssec else "DNSSEC not found ❌ — DANE not supported"
+        if is_dnssec_enabled(domain):
+            dane_result = "DNSSEC is enabled ✅ — DANE can be configured"
+        else:
+            dane_result = "DNSSEC not found ❌ — DANE not supported"
 
     html = f"""
     <!DOCTYPE html>
