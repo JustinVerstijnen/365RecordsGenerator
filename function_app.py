@@ -1,8 +1,11 @@
+import json
+import dns.resolver
+import dns.exception
 import azure.functions as func
 
 app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
 
-@app.route(route="/", methods=["GET"], auth_level=func.AuthLevel.ANONYMOUS)
+@app.route(route="/", methods=["GET"])
 def main(req: func.HttpRequest) -> func.HttpResponse:
     html = """
     <!DOCTYPE html>
@@ -12,6 +15,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         <title>M365 DNS Generator - justinverstijnen.nl</title>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
         <style>
             body {
                 font-family: 'Segoe UI', sans-serif;
@@ -144,13 +148,14 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                             </td>
                         </tr>
                         <tr>
-                            <td>SMTP DANE</td><td>TLSA</td>
-                            <td class="greyed">Wordt handmatig opgehaald via TLS-certificaat</td>
-                            <td class="greyed">Geen actie nodig</td>
+                            <td>SMTP DANE / DNSSEC</td><td>TLSA</td>
+                            <td id="dnssec-status"><em>Bezig met controleren...</em></td>
+                            <td class="greyed">Automatische controle op DNSSEC en DS-record</td>
                         </tr>
                     </tbody>
                 </table>`;
                 document.getElementById("output").innerHTML = table;
+                updateDNSSEC(domain);
             }
 
             function updateSPF() {
@@ -191,8 +196,52 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                 doc.autoTable({ html: "#dns-table", startY: 20 });
                 doc.save("M365-DNS-records.pdf");
             }
+
+            function updateDNSSEC(domain) {
+                fetch(`/api/dnssec-check?domain=${domain}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const output = document.getElementById("dnssec-status");
+                        if (data.dnssec && data.ds) {
+                            output.innerHTML = "✅ DNSSEC actief + DS-record aanwezig";
+                        } else if (data.dnssec) {
+                            output.innerHTML = "⚠️ DNSSEC actief, maar geen DS-record";
+                        } else {
+                            output.innerHTML = "❌ Geen DNSSEC gedetecteerd";
+                        }
+                    })
+                    .catch(error => {
+                        document.getElementById("dnssec-status").innerHTML = "❌ Fout bij ophalen DNSSEC status";
+                        console.error("DNSSEC check error:", error);
+                    });
+            }
         </script>
     </body>
     </html>
     """
     return func.HttpResponse(html, mimetype="text/html")
+
+@app.route(route="/dnssec-check", methods=["GET"])
+def dnssec_check(req: func.HttpRequest) -> func.HttpResponse:
+    domain = req.params.get("domain")
+    if not domain:
+        return func.HttpResponse(json.dumps({"error": "Domein vereist"}), status_code=400, mimetype="application/json")
+
+    try:
+        dnskey_response = dns.resolver.resolve(domain, 'DNSKEY', raise_on_no_answer=False)
+        has_dnskey = bool(dnskey_response.rrset)
+
+        ds_response = dns.resolver.resolve(domain, 'DS', raise_on_no_answer=False)
+        has_ds = bool(ds_response.rrset)
+
+        result = {
+            "dnssec": has_dnskey,
+            "ds": has_ds
+        }
+        return func.HttpResponse(json.dumps(result), mimetype="application/json")
+    except dns.resolver.NoNameservers:
+        return func.HttpResponse(json.dumps({"error": "Geen geldige nameservers of fout bij resolutie"}), status_code=500, mimetype="application/json")
+    except dns.resolver.NXDOMAIN:
+        return func.HttpResponse(json.dumps({"error": "Domein bestaat niet"}), status_code=404, mimetype="application/json")
+    except dns.exception.DNSException as e:
+        return func.HttpResponse(json.dumps({"error": str(e)}), status_code=500, mimetype="application/json")
