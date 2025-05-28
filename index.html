@@ -20,11 +20,12 @@
     box-shadow: 0 4px 16px rgb(0 0 0 / 0.1);
     max-width: 900px;
     width: 100%;
-    padding: 2rem 2.5rem;
+    padding: 1.25rem 1.5rem;
+    font-size: 14px; /* smaller font */
   }
   header {
     text-align: center;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
   }
   header img {
     width: 50px;
@@ -35,18 +36,24 @@
   h1, h2 {
     color: #8EAFDA;
     font-weight: 600;
-    margin-top: 1.5rem;
-    margin-bottom: 0.75rem;
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
   }
   h1 {
-    font-size: 1.75rem;
+    font-size: 1.5rem;
     margin-top: 0;
+  }
+  .description {
+    font-size: 1rem;
+    color: #555;
+    margin-top: 0;
+    margin-bottom: 1rem;
   }
   label {
     display: block;
     font-weight: 600;
-    margin-top: 1.2rem;
-    margin-bottom: 0.3rem;
+    margin-top: 1rem;
+    margin-bottom: 0.25rem;
     color: #444;
   }
   input[type="text"],
@@ -54,8 +61,8 @@
   input[type="date"],
   select {
     width: 100%;
-    padding: 0.65rem 1rem;
-    font-size: 1rem;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.9rem;
     border: 1.5px solid #d1d9e6;
     border-radius: 8px;
     transition: border-color 0.2s ease;
@@ -67,32 +74,32 @@
   select:focus {
     outline: none;
     border-color: #8EAFDA;
-    box-shadow: 0 0 6px #a7c7f9;
+    box-shadow: 0 0 5px #a7c7f9;
   }
   button, .customize-toggle-btn {
     font-weight: 600;
-    border-radius: 10px;
+    border-radius: 8px;
     cursor: pointer;
     transition: background-color 0.2s ease;
   }
   button {
-    margin-top: 2rem;
+    margin-top: 1.5rem;
     width: 100%;
     background-color: #8EAFDA;
     border: none;
     color: white;
-    font-size: 1.1rem;
-    padding: 0.85rem;
+    font-size: 1rem;
+    padding: 0.7rem;
   }
   button:hover {
     background-color: #6b8ec6;
   }
   .customize-toggle-btn {
-    margin-top: 1.5rem;
+    margin-top: 1rem;
     background-color: #f9c74f;
     color: #444;
     border: 2px solid #f9c74f;
-    padding: 0.5rem 1rem;
+    padding: 0.4rem 0.9rem;
     width: auto;
     display: inline-block;
   }
@@ -102,49 +109,51 @@
     border-color: #e0b732;
   }
   #customizeSection {
-    margin-top: 1rem;
+    margin-top: 0.75rem;
     display: none;
   }
   table {
     width: 100%;
     border-collapse: separate;
-    border-spacing: 0 8px;
-    margin-top: 0.75rem;
+    border-spacing: 0 6px;
+    margin-top: 0.5rem;
   }
   th, td {
-    padding: 0.65rem 1rem;
+    padding: 0.4rem 0.7rem;
     text-align: left;
     vertical-align: middle;
     word-break: break-word;
+    font-size: 13px;
   }
   th {
     font-weight: 600;
     color: #555;
     background: #f0f3f7;
-    border-radius: 8px;
+    border-radius: 6px;
   }
   tbody tr {
     background: #f9fbff;
     box-shadow: 0 1px 3px rgb(0 0 0 / 0.05);
-    border-radius: 8px;
+    border-radius: 6px;
   }
   tbody tr td:first-child {
-    border-top-left-radius: 8px;
-    border-bottom-left-radius: 8px;
+    border-top-left-radius: 6px;
+    border-bottom-left-radius: 6px;
   }
   tbody tr td:last-child {
-    border-top-right-radius: 8px;
-    border-bottom-right-radius: 8px;
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
   }
   code {
     font-family: 'Courier New', Courier, monospace;
     background: #e8f0fe;
-    padding: 0.2rem 0.4rem;
+    padding: 0.15rem 0.3rem;
     border-radius: 5px;
     display: block;
     max-width: 100%;
     white-space: normal;
     word-wrap: break-word;
+    font-size: 13px;
   }
   .copy-btn {
     cursor: pointer;
@@ -152,8 +161,9 @@
     border: none;
     color: white;
     font-weight: 600;
-    padding: 0.3rem 0.7rem;
+    padding: 0.25rem 0.5rem;
     border-radius: 6px;
+    font-size: 13px;
     transition: background-color 0.2s ease;
   }
   .copy-btn:hover {
@@ -166,7 +176,7 @@
   }
   .inline-inputs > div {
     flex: 1;
-    min-width: 200px;
+    min-width: 180px;
   }
   @media (max-width: 600px) {
     main {
@@ -177,7 +187,7 @@
     }
   }
   .mode-toggle {
-    margin-top: 1.5rem;
+    margin-top: 1rem;
     display: flex;
     align-items: center;
     gap: 1rem;
@@ -191,6 +201,13 @@
     margin-right: 0.3rem;
     cursor: pointer;
   }
+  /* Simple mode output */
+  #results.simple {
+    white-space: pre-wrap;
+    font-family: monospace;
+    margin-top: 1rem;
+    font-size: 14px;
+  }
 </style>
 </head>
 <body>
@@ -201,6 +218,10 @@
     </a>
     <h1>Microsoft 365 DNS Record Generator</h1>
   </header>
+
+  <p class="description">
+    Quickly generate Microsoft 365 DNS records for your custom domains including MX, SPF, DKIM, DMARC, and MTA-STS. Customize advanced settings and export your records.
+  </p>
 
   <label for="defaultDomain">Default domain (e.g. yourname.onmicrosoft.com):</label>
   <input type="text" id="defaultDomain" placeholder="example.onmicrosoft.com" />
@@ -220,11 +241,11 @@
     <div class="inline-inputs">
       <div>
         <label for="dmarcRUA">RUA Email (aggregate reports):</label>
-        <input type="email" id="dmarcRUA" placeholder="mailto:admin@example.com" />
+        <input type="email" id="dmarcRUA" placeholder="admin@example.com" />
       </div>
       <div>
         <label for="dmarcRUF">RUF Email (forensic reports):</label>
-        <input type="email" id="dmarcRUF" placeholder="mailto:admin@example.com" />
+        <input type="email" id="dmarcRUF" placeholder="admin@example.com" />
       </div>
       <div style="flex: 1; min-width: 150px;">
         <label for="dmarcPolicy">DMARC Policy:</label>
@@ -237,13 +258,28 @@
     </div>
 
     <h2>MTA-STS Settings</h2>
-    <label for="mtaStsDate">Select date for MTA-STS id:</label>
-    <input type="date" id="mtaStsDate" />
+    <div class="inline-inputs">
+      <div>
+        <label for="mtaStsDate">Select date for MTA-STS id:</label>
+        <input type="date" id="mtaStsDate" />
+      </div>
+      <div>
+        <label for="mtaStsEmail">MTA-STS Report Email (RUA):</label>
+        <input type="email" id="mtaStsEmail" placeholder="admin@example.com" />
+      </div>
+    </div>
+
+    <h2>SPF Settings</h2>
+    <fieldset style="margin-top: 1rem; border: none; padding: 0;">
+      <legend style="font-weight: 600; color: #444; margin-bottom: 0.5rem;">SPF Fail Type:</legend>
+      <label><input type="radio" name="spfFail" value="hard" checked /> Hardfail (-all)</label><br />
+      <label><input type="radio" name="spfFail" value="soft" /> Softfail (~all)</label>
+    </fieldset>
   </section>
 
   <button id="generateBtn">Generate Records</button>
 
-  <div id="results" tabindex="0"></div>
+  <pre id="results" tabindex="0"></pre>
 </main>
 
 <script>
@@ -251,6 +287,7 @@
   const customizeSection = document.getElementById('customizeSection');
   const resultsDiv = document.getElementById('results');
   const modeRadios = document.querySelectorAll('input[name="mode"]');
+  const spfFailRadios = document.querySelectorAll('input[name="spfFail"]');
 
   toggleBtn.addEventListener('click', () => {
     const isHidden = customizeSection.style.display === 'none' || customizeSection.style.display === '';
@@ -264,6 +301,12 @@
     return text.replace(/[&<>"']/g, c => ({
       '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
     })[c]);
+  }
+
+  function isValidEmail(email) {
+    // Simple email regex (not perfect but good enough)
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
   }
 
   function copyToClipboard(text) {
@@ -287,6 +330,13 @@
     return 'extended';
   }
 
+  function getSelectedSPFFail() {
+    for (const radio of spfFailRadios) {
+      if (radio.checked) return radio.value;
+    }
+    return 'hard';
+  }
+
   document.getElementById('generateBtn').addEventListener('click', () => {
     const defaultDomain = document.getElementById('defaultDomain').value.trim();
     const customDomain = document.getElementById('customDomain').value.trim();
@@ -294,9 +344,25 @@
     const dmarcRUF = document.getElementById('dmarcRUF').value.trim();
     const dmarcPolicy = document.getElementById('dmarcPolicy').value;
     const mtaStsDateInput = document.getElementById('mtaStsDate').value;
+    const mtaStsEmail = document.getElementById('mtaStsEmail').value.trim();
+    const spfFailType = getSelectedSPFFail();
 
     if (!defaultDomain || !customDomain) {
       alert('Please fill in both Default domain and Custom domain.');
+      return;
+    }
+
+    // Validate emails if entered
+    if (dmarcRUA && !isValidEmail(dmarcRUA)) {
+      alert('Please enter a valid RUA email address.');
+      return;
+    }
+    if (dmarcRUF && !isValidEmail(dmarcRUF)) {
+      alert('Please enter a valid RUF email address.');
+      return;
+    }
+    if (mtaStsEmail && !isValidEmail(mtaStsEmail)) {
+      alert('Please enter a valid MTA-STS Report email address.');
       return;
     }
 
@@ -307,14 +373,24 @@
 
     const mtaStsIdDate = mtaStsDateInput ? formatDate(mtaStsDateInput) : formatDate(new Date());
 
+    // SPF record value with fail type
+    const spfValue = `v=spf1 include:spf.protection.outlook.com ${spfFailType === 'hard' ? '-all' : '~all'}`;
+
+    // Construct DMARC record with optional RUA and RUF tags and policy, add mailto: prefix
     let dmarcValue = `v=DMARC1; p=${dmarcPolicy};`;
-    if (dmarcRUA) dmarcValue += ` rua=${dmarcRUA};`;
-    if (dmarcRUF) dmarcValue += ` ruf=${dmarcRUF};`;
+    if (dmarcRUA) dmarcValue += ` rua=mailto:${dmarcRUA};`;
+    if (dmarcRUF) dmarcValue += ` ruf=mailto:${dmarcRUF};`;
+
+    // Construct MTA-STS record with optional rua email, mailto: prefix
+    let mtaStsValue = `v=STSv1; id=${mtaStsIdDate}`;
+    if (mtaStsEmail) {
+      mtaStsValue += `; rua=mailto:${mtaStsEmail}`;
+    }
 
     const records = {
       "DKIM Records": [
-        { name: "selector1._domainkey", ttl: "3600", record: dkim1 },
-        { name: "selector2._domainkey", ttl: "3600", record: dkim2 },
+        { name: "selector1._domainkey", type: "CNAME", ttl: "3600", record: dkim1 },
+        { name: "selector2._domainkey", type: "CNAME", ttl: "3600", record: dkim2 },
       ],
       "MX Record": [
         { name: "@", type: "MX", priority: "0", value: mxValue }
@@ -323,13 +399,13 @@
         { name: "autodiscover", type: "CNAME", value: "autodiscover.outlook.com" }
       ],
       "SPF Record": [
-        { name: "@", type: "TXT", value: "v=spf1 include:spf.protection.outlook.com -all" }
+        { name: "@", type: "TXT", value: spfValue }
       ],
       "DMARC Record": [
         { name: "_dmarc", type: "TXT", value: dmarcValue }
       ],
       "MTA-STS Record": [
-        { name: "_mta-sts", type: "TXT", value: `v=STSv1; id=${mtaStsIdDate}` }
+        { name: "_mta-sts", type: "TXT", value: mtaStsValue }
       ]
     };
 
@@ -337,16 +413,17 @@
 
     if (mode === 'simple') {
       resultsDiv.classList.add('simple');
-      let simpleHtml = '<ul style="list-style:none; padding-left:0;">';
+      // Simple output with two tabs between fields for spacing
+      let simpleLines = [];
       for (const recs of Object.values(records)) {
         recs.forEach(rec => {
-          let type = rec.type || (rec.record ? "DKIM" : "TXT");
-          let value = rec.record || rec.value || "";
-          simpleHtml += `<li>${escapeHtml(type)}: ${escapeHtml(value)}</li>`;
+          const type = rec.type || (rec.record ? "CNAME" : "TXT");
+          const hostname = rec.name;
+          const value = rec.record || rec.value || "";
+          simpleLines.push(`${type}\t\t${hostname}\t\t${value}`);
         });
       }
-      simpleHtml += '</ul>';
-      resultsDiv.innerHTML = simpleHtml;
+      resultsDiv.textContent = simpleLines.join('\n');
     } else {
       resultsDiv.classList.remove('simple');
       let html = '';
