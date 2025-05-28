@@ -1,14 +1,14 @@
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="en">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>DNS Record Generator Microsoft 365</title>
+<title>Microsoft 365 DNS Record Generator</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
 
-  body {
-    font-family: 'Inter', sans-serif;
+    body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: #f7f8fb;
     color: #222;
     margin: 0;
@@ -27,29 +27,27 @@
   }
 
   header {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
+    text-align: center;
     margin-bottom: 1.5rem;
-  }
-
-  header a {
-    display: inline-block;
-    width: 50px;
-    height: 50px;
   }
 
   header img {
     width: 50px;
     height: 50px;
     object-fit: contain;
+    margin-bottom: 0.5rem;
+  }
+
+  h1, h2 {
+    color: #8EAFDA;
+    font-weight: 600;
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
   }
 
   h1 {
-    margin: 0;
-    font-weight: 600;
     font-size: 1.75rem;
-    color: #0047ba;
+    margin-top: 0;
   }
 
   label {
@@ -62,7 +60,8 @@
 
   input[type="text"],
   input[type="email"],
-  input[type="date"] {
+  input[type="date"],
+  select {
     width: 100%;
     padding: 0.65rem 1rem;
     font-size: 1rem;
@@ -74,16 +73,17 @@
 
   input[type="text"]:focus,
   input[type="email"]:focus,
-  input[type="date"]:focus {
+  input[type="date"]:focus,
+  select:focus {
     outline: none;
-    border-color: #0078d7;
+    border-color: #8EAFDA;
     box-shadow: 0 0 6px #a7c7f9;
   }
 
   button {
     margin-top: 2rem;
     width: 100%;
-    background-color: #0078d7;
+    background-color: #8EAFDA;
     border: none;
     color: white;
     font-weight: 600;
@@ -95,16 +95,31 @@
   }
 
   button:hover {
-    background-color: #005ea3;
+    background-color: #6b8ec6;
   }
 
-  h2 {
-    margin-top: 2rem;
-    color: #0047ba;
+  .customize-toggle-btn {
+    margin-top: 1.5rem;
+    background-color: transparent;
+    color: #8EAFDA;
+    border: 2px solid #8EAFDA;
     font-weight: 600;
-    font-size: 1.25rem;
-    border-bottom: 2px solid #d1d9e6;
-    padding-bottom: 0.4rem;
+    padding: 0.5rem 1rem;
+    border-radius: 10px;
+    cursor: pointer;
+    width: auto;
+    display: inline-block;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  .customize-toggle-btn:hover {
+    background-color: #8EAFDA;
+    color: white;
+  }
+
+  #customizeSection {
+    margin-top: 1rem;
+    display: none;
   }
 
   table {
@@ -156,7 +171,7 @@
 
   .copy-btn {
     cursor: pointer;
-    background: #0078d7;
+    background: #8EAFDA;
     border: none;
     color: white;
     font-weight: 600;
@@ -166,7 +181,7 @@
   }
 
   .copy-btn:hover {
-    background: #005ea3;
+    background: #6b8ec6;
   }
 
   .inline-inputs {
@@ -194,40 +209,62 @@
 <body>
 <main>
   <header>
-    <a href="https://justinverstijnen.nl" target="_blank" rel="noopener noreferrer" title="Ga naar justinverstijnen.nl">
-      <img src="https://justinverstijnen.nl/wp-content/uploads/2025/04/cropped-Logo-2.0-Transparant.png" alt="Logo Justin Verstijnen" />
+    <a href="https://justinverstijnen.nl" target="_blank" rel="noopener noreferrer" title="Go to justinverstijnen.nl">
+      <img src="https://justinverstijnen.nl/wp-content/uploads/2025/04/cropped-Logo-2.0-Transparant.png" alt="Justin Verstijnen Logo" />
     </a>
-    <h1>DNS Record Generator voor Microsoft 365</h1>
+    <h1>Microsoft 365 DNS Record Generator</h1>
   </header>
 
-  <label for="defaultDomain">Default domain (bv. jouwnaam.onmicrosoft.com):</label>
-  <input type="text" id="defaultDomain" placeholder="voorbeeld.onmicrosoft.com" />
+  <label for="defaultDomain">Default domain (e.g. yourname.onmicrosoft.com):</label>
+  <input type="text" id="defaultDomain" placeholder="example.onmicrosoft.com" />
 
-  <label for="customDomain">Custom domain (bv. jouwnaam.nl):</label>
-  <input type="text" id="customDomain" placeholder="voorbeeld.nl" />
+  <label for="customDomain">Custom domain (e.g. yourdomain.com):</label>
+  <input type="text" id="customDomain" placeholder="example.com" />
 
-  <h2>DMARC instellingen</h2>
-  <div class="inline-inputs">
-    <div>
-      <label for="dmarcRUA">RUA email (rapportage):</label>
-      <input type="email" id="dmarcRUA" placeholder="mailto:admin@voorbeeld.nl" />
+  <button id="toggleCustomize" class="customize-toggle-btn">Customize</button>
+
+  <section id="customizeSection" aria-hidden="true">
+    <h2>DMARC Settings</h2>
+    <div class="inline-inputs">
+      <div>
+        <label for="dmarcRUA">RUA Email (aggregate reports):</label>
+        <input type="email" id="dmarcRUA" placeholder="mailto:admin@example.com" />
+      </div>
+      <div>
+        <label for="dmarcRUF">RUF Email (forensic reports):</label>
+        <input type="email" id="dmarcRUF" placeholder="mailto:admin@example.com" />
+      </div>
+      <div style="flex: 1; min-width: 150px;">
+        <label for="dmarcPolicy">DMARC Policy:</label>
+        <select id="dmarcPolicy">
+          <option value="reject" selected>Reject</option>
+          <option value="quarantine">Quarantine</option>
+          <option value="none">None</option>
+        </select>
+      </div>
     </div>
-    <div>
-      <label for="dmarcRUF">RUF email (forensisch rapport):</label>
-      <input type="email" id="dmarcRUF" placeholder="mailto:admin@voorbeeld.nl" />
-    </div>
-  </div>
 
-  <h2>MTA-STS instellingen</h2>
-  <label for="mtaStsDate">Kies de datum voor MTA-STS id:</label>
-  <input type="date" id="mtaStsDate" />
+    <h2>MTA-STS Settings</h2>
+    <label for="mtaStsDate">Select date for MTA-STS id:</label>
+    <input type="date" id="mtaStsDate" />
+  </section>
 
-  <button id="generateBtn">Genereer records</button>
+  <button id="generateBtn">Generate Records</button>
 
   <div id="results"></div>
 </main>
 
 <script>
+  const toggleBtn = document.getElementById('toggleCustomize');
+  const customizeSection = document.getElementById('customizeSection');
+
+  toggleBtn.addEventListener('click', () => {
+    const isHidden = customizeSection.style.display === 'none' || customizeSection.style.display === '';
+    customizeSection.style.display = isHidden ? 'block' : 'none';
+    customizeSection.setAttribute('aria-hidden', !isHidden);
+    toggleBtn.textContent = isHidden ? 'Hide Customize' : 'Customize';
+  });
+
   function escapeHtml(text) {
     return text.replace(/[&<>"']/g, c => ({
       '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
@@ -236,7 +273,7 @@
 
   function copyToClipboard(text) {
     navigator.clipboard.writeText(text).then(() => {
-      alert('Gekopieerd naar klembord!');
+      alert('Copied to clipboard!');
     });
   }
 
@@ -254,10 +291,11 @@
     const customDomain = document.getElementById('customDomain').value.trim();
     const dmarcRUA = document.getElementById('dmarcRUA').value.trim();
     const dmarcRUF = document.getElementById('dmarcRUF').value.trim();
+    const dmarcPolicy = document.getElementById('dmarcPolicy').value;
     const mtaStsDateInput = document.getElementById('mtaStsDate').value;
 
     if (!defaultDomain || !customDomain) {
-      alert('Vul zowel Default domain als Custom domain in.');
+      alert('Please fill in both Default domain and Custom domain.');
       return;
     }
 
@@ -271,8 +309,8 @@
     // Format MTA-STS id date or fallback to today
     const mtaStsIdDate = mtaStsDateInput ? formatDate(mtaStsDateInput) : formatDate(new Date());
 
-    // Construct DMARC record with optional RUA and RUF tags
-    let dmarcValue = `v=DMARC1; p=none;`;
+    // Construct DMARC record with optional RUA and RUF tags and policy
+    let dmarcValue = `v=DMARC1; p=${dmarcPolicy};`;
     if (dmarcRUA) dmarcValue += ` rua=${dmarcRUA};`;
     if (dmarcRUF) dmarcValue += ` ruf=${dmarcRUF};`;
 
