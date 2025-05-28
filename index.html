@@ -1,11 +1,152 @@
 <!DOCTYPE html>
 <html lang="nl">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>DNS Record Generator Microsoft 365</title>
-  </head>
-  <body>
-    <div id="root"></div>
-  </body>
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>DNS Record Generator Microsoft 365</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    max-width: 600px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+  }
+  input, button {
+    width: 100%;
+    padding: 0.5rem;
+    margin-top: 0.3rem;
+    box-sizing: border-box;
+  }
+  button {
+    margin-top: 1rem;
+    cursor: pointer;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+  }
+  th, td {
+    border: 1px solid #ccc;
+    padding: 0.5rem;
+  }
+  code {
+    font-family: monospace;
+  }
+  .copy-btn {
+    cursor: pointer;
+    background: #0078d7;
+    color: white;
+    border: none;
+    padding: 0.3rem 0.6rem;
+    border-radius: 3px;
+  }
+</style>
+</head>
+<body>
+<h1>DNS Record Generator voor Microsoft 365</h1>
+
+<label>
+  Default domain (bv. jouwnaam.onmicrosoft.com):
+  <input type="text" id="defaultDomain" placeholder="voorbeeld.onmicrosoft.com" />
+</label>
+
+<label>
+  Custom domain (bv. jouwnaam.nl):
+  <input type="text" id="customDomain" placeholder="voorbeeld.nl" />
+</label>
+
+<button id="generateBtn">Genereer records</button>
+
+<div id="results"></div>
+
+<script>
+  function escapeHtml(text) {
+    return text.replace(/[&<>"']/g, c => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    })[c]);
+  }
+
+  function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => {
+      alert('Gekopieerd naar klembord!');
+    });
+  }
+
+  document.getElementById('generateBtn').addEventListener('click', () => {
+    const defaultDomain = document.getElementById('defaultDomain').value.trim();
+    const customDomain = document.getElementById('customDomain').value.trim();
+
+    if (!defaultDomain || !customDomain) {
+      alert('Vul beide domeinen in.');
+      return;
+    }
+
+    // DKIM records
+    const dkim1 = `selector1-${customDomain.replace(/\./g, '-')}._domainkey.${defaultDomain}`;
+    const dkim2 = `selector2-${customDomain.replace(/\./g, '-')}._domainkey.${defaultDomain}`;
+
+    // MX record
+    const mxValue = defaultDomain.includes('onmicrosoft.com')
+      ? defaultDomain.replace('onmicrosoft.com', 'mail.protection.outlook.com')
+      : 'mail.protection.outlook.com';
+
+    // Records data
+    const records = {
+      "DKIM Records": [
+        { name: "selector1._domainkey", ttl: "3600", record: dkim1 },
+        { name: "selector2._domainkey", ttl: "3600", record: dkim2 },
+      ],
+      "MX Record": [
+        { name: "@", type: "MX", priority: "0", value: mxValue }
+      ],
+      "Autodiscover Record": [
+        { name: "autodiscover", type: "CNAME", value: "autodiscover.outlook.com" }
+      ],
+      "SPF Record": [
+        { name: "@", type: "TXT", value: "v=spf1 include:spf.protection.outlook.com -all" }
+      ],
+      "DMARC Record": [
+        { name: "_dmarc", type: "TXT", value: `v=DMARC1; p=none; rua=mailto:admin@${customDomain}` }
+      ],
+      "MTA-STS Record": [
+        { name: "_mta-sts", type: "TXT", value: "v=STSv1; id=20250527T0000Z" }
+      ]
+    };
+
+    let html = '';
+
+    for (const [section, recs] of Object.entries(records)) {
+      html += `<h2>${section}</h2><table><thead><tr>`;
+      if (section === "DKIM Records") {
+        html += `<th>Name</th><th>TTL</th><th>Record</th><th>Copy</th>`;
+      } else if (section === "MX Record") {
+        html += `<th>Name</th><th>Type</th><th>Priority</th><th>Value</th><th>Copy</th>`;
+      } else {
+        html += `<th>Name</th><th>Type</th><th>Value</th><th>Copy</th>`;
+      }
+      html += `</tr></thead><tbody>`;
+
+      recs.forEach(rec => {
+        html += `<tr>`;
+        if (section === "DKIM Records") {
+          html += `<td>${escapeHtml(rec.name)}</td><td>${escapeHtml(rec.ttl)}</td><td><code>${escapeHtml(rec.record)}</code></td>`;
+          html += `<td><button class="copy-btn" onclick="copyToClipboard('${escapeHtml(rec.record)}')">Copy</button></td>`;
+        } else if (section === "MX Record") {
+          html += `<td>${escapeHtml(rec.name)}</td><td>${escapeHtml(rec.type)}</td><td>${escapeHtml(rec.priority)}</td><td><code>${escapeHtml(rec.value)}</code></td>`;
+          html += `<td><button class="copy-btn" onclick="copyToClipboard('${escapeHtml(rec.value)}')">Copy</button></td>`;
+        } else {
+          html += `<td>${escapeHtml(rec.name)}</td><td>${escapeHtml(rec.type)}</td><td><code>${escapeHtml(rec.value)}</code></td>`;
+          html += `<td><button class="copy-btn" onclick="copyToClipboard('${escapeHtml(rec.value)}')">Copy</button></td>`;
+        }
+        html += `</tr>`;
+      });
+
+      html += `</tbody></table>`;
+    }
+
+    document.getElementById('results').innerHTML = html;
+  });
+</script>
+</body>
 </html>
