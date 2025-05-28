@@ -14,7 +14,6 @@
     display: flex;
     justify-content: center;
   }
-
   main {
     background: white;
     border-radius: 12px;
@@ -23,31 +22,26 @@
     width: 100%;
     padding: 2rem 2.5rem;
   }
-
   header {
     text-align: center;
     margin-bottom: 1.5rem;
   }
-
   header img {
     width: 50px;
     height: 50px;
     object-fit: contain;
     margin-bottom: 0.5rem;
   }
-
   h1, h2 {
     color: #8EAFDA;
     font-weight: 600;
     margin-top: 1.5rem;
     margin-bottom: 0.75rem;
   }
-
   h1 {
     font-size: 1.75rem;
     margin-top: 0;
   }
-
   label {
     display: block;
     font-weight: 600;
@@ -55,7 +49,6 @@
     margin-bottom: 0.3rem;
     color: #444;
   }
-
   input[type="text"],
   input[type="email"],
   input[type="date"],
@@ -68,7 +61,6 @@
     transition: border-color 0.2s ease;
     box-sizing: border-box;
   }
-
   input[type="text"]:focus,
   input[type="email"]:focus,
   input[type="date"]:focus,
@@ -77,14 +69,12 @@
     border-color: #8EAFDA;
     box-shadow: 0 0 6px #a7c7f9;
   }
-
   button, .customize-toggle-btn {
     font-weight: 600;
     border-radius: 10px;
     cursor: pointer;
     transition: background-color 0.2s ease;
   }
-
   button {
     margin-top: 2rem;
     width: 100%;
@@ -97,7 +87,6 @@
   button:hover {
     background-color: #6b8ec6;
   }
-
   .customize-toggle-btn {
     margin-top: 1.5rem;
     background-color: #f9c74f;
@@ -112,39 +101,33 @@
     color: #222;
     border-color: #e0b732;
   }
-
   #customizeSection {
     margin-top: 1rem;
     display: none;
   }
-
   table {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0 8px;
     margin-top: 0.75rem;
   }
-
   th, td {
     padding: 0.65rem 1rem;
     text-align: left;
     vertical-align: middle;
     word-break: break-word;
   }
-
   th {
     font-weight: 600;
     color: #555;
     background: #f0f3f7;
     border-radius: 8px;
   }
-
   tbody tr {
     background: #f9fbff;
     box-shadow: 0 1px 3px rgb(0 0 0 / 0.05);
     border-radius: 8px;
   }
-
   tbody tr td:first-child {
     border-top-left-radius: 8px;
     border-bottom-left-radius: 8px;
@@ -153,7 +136,6 @@
     border-top-right-radius: 8px;
     border-bottom-right-radius: 8px;
   }
-
   code {
     font-family: 'Courier New', Courier, monospace;
     background: #e8f0fe;
@@ -164,7 +146,6 @@
     white-space: normal;
     word-wrap: break-word;
   }
-
   .copy-btn {
     cursor: pointer;
     background: #8EAFDA;
@@ -175,23 +156,18 @@
     border-radius: 6px;
     transition: background-color 0.2s ease;
   }
-
   .copy-btn:hover {
     background: #6b8ec6;
   }
-
   .inline-inputs {
     display: flex;
     gap: 1rem;
     flex-wrap: wrap;
   }
-
   .inline-inputs > div {
     flex: 1;
     min-width: 200px;
   }
-
-  /* Responsive */
   @media (max-width: 600px) {
     main {
       padding: 1rem 1rem;
@@ -200,8 +176,6 @@
       flex-direction: column;
     }
   }
-
-  /* Mode toggle styles */
   .mode-toggle {
     margin-top: 1.5rem;
     display: flex;
@@ -216,32 +190,6 @@
   .mode-toggle input[type="radio"] {
     margin-right: 0.3rem;
     cursor: pointer;
-  }
-
-  /* Simple mode list styling */
-  #results.simple ul {
-    list-style: none;
-    padding-left: 0;
-  }
-  #results.simple ul li {
-    background: #f9fbff;
-    margin: 6px 0;
-    padding: 0.6rem 1rem;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgb(0 0 0 / 0.05);
-    display: flex;
-    justify-content: space-between;
-    font-family: 'Courier New', Courier, monospace;
-  }
-  #results.simple ul li button.copy-btn {
-    background: #f9c74f;
-    color: #444;
-    padding: 0.3rem 0.6rem;
-    font-weight: 600;
-  }
-  #results.simple ul li button.copy-btn:hover {
-    background: #e0b732;
-    color: #222;
   }
 </style>
 </head>
@@ -389,18 +337,15 @@
 
     if (mode === 'simple') {
       resultsDiv.classList.add('simple');
-      let simpleHtml = '';
-      for (const [section, recs] of Object.entries(records)) {
-        simpleHtml += `<h2>${section}</h2><ul>`;
+      let simpleHtml = '<ul style="list-style:none; padding-left:0;">';
+      for (const recs of Object.values(records)) {
         recs.forEach(rec => {
-          let displayValue = '';
-          if (rec.record) displayValue = rec.record;
-          else if (rec.value) displayValue = rec.value;
-          else displayValue = '';
-          simpleHtml += `<li><span>${escapeHtml(rec.name)}</span> <code>${escapeHtml(displayValue)}</code> <button class="copy-btn" onclick="copyToClipboard('${escapeHtml(displayValue)}')">Copy</button></li>`;
+          let type = rec.type || (rec.record ? "DKIM" : "TXT");
+          let value = rec.record || rec.value || "";
+          simpleHtml += `<li>${escapeHtml(type)}: ${escapeHtml(value)}</li>`;
         });
-        simpleHtml += `</ul>`;
       }
+      simpleHtml += '</ul>';
       resultsDiv.innerHTML = simpleHtml;
     } else {
       resultsDiv.classList.remove('simple');
