@@ -21,14 +21,33 @@
     background: white;
     border-radius: 12px;
     box-shadow: 0 4px 16px rgb(0 0 0 / 0.1);
-    max-width: 600px;
+    max-width: 900px;
     width: 100%;
     padding: 2rem 2.5rem;
   }
 
-  h1 {
-    font-weight: 600;
+  header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
     margin-bottom: 1.5rem;
+  }
+
+  header a {
+    display: inline-block;
+    width: 50px;
+    height: 50px;
+  }
+
+  header img {
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
+  }
+
+  h1 {
+    margin: 0;
+    font-weight: 600;
     font-size: 1.75rem;
     color: #0047ba;
   }
@@ -41,16 +60,21 @@
     color: #444;
   }
 
-  input[type="text"] {
+  input[type="text"],
+  input[type="email"],
+  input[type="date"] {
     width: 100%;
     padding: 0.65rem 1rem;
     font-size: 1rem;
     border: 1.5px solid #d1d9e6;
     border-radius: 8px;
     transition: border-color 0.2s ease;
+    box-sizing: border-box;
   }
 
-  input[type="text"]:focus {
+  input[type="text"]:focus,
+  input[type="email"]:focus,
+  input[type="date"]:focus {
     outline: none;
     border-color: #0078d7;
     box-shadow: 0 0 6px #a7c7f9;
@@ -93,6 +117,8 @@
   th, td {
     padding: 0.65rem 1rem;
     text-align: left;
+    vertical-align: middle;
+    word-break: break-word;
   }
 
   th {
@@ -122,10 +148,10 @@
     background: #e8f0fe;
     padding: 0.2rem 0.4rem;
     border-radius: 5px;
-    display: inline-block;
+    display: block;
     max-width: 100%;
-    white-space: nowrap;
-    overflow-x: auto;
+    white-space: normal;
+    word-wrap: break-word;
   }
 
   .copy-btn {
@@ -142,17 +168,59 @@
   .copy-btn:hover {
     background: #005ea3;
   }
+
+  .inline-inputs {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .inline-inputs > div {
+    flex: 1;
+    min-width: 200px;
+  }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    main {
+      padding: 1rem 1rem;
+    }
+    .inline-inputs {
+      flex-direction: column;
+    }
+  }
 </style>
 </head>
 <body>
 <main>
-  <h1>DNS Record Generator voor Microsoft 365</h1>
+  <header>
+    <a href="https://justinverstijnen.nl" target="_blank" rel="noopener noreferrer" title="Ga naar justinverstijnen.nl">
+      <img src="https://justinverstijnen.nl/wp-content/uploads/2025/04/cropped-Logo-2.0-Transparant.png" alt="Logo Justin Verstijnen" />
+    </a>
+    <h1>DNS Record Generator voor Microsoft 365</h1>
+  </header>
 
   <label for="defaultDomain">Default domain (bv. jouwnaam.onmicrosoft.com):</label>
   <input type="text" id="defaultDomain" placeholder="voorbeeld.onmicrosoft.com" />
 
   <label for="customDomain">Custom domain (bv. jouwnaam.nl):</label>
   <input type="text" id="customDomain" placeholder="voorbeeld.nl" />
+
+  <h2>DMARC instellingen</h2>
+  <div class="inline-inputs">
+    <div>
+      <label for="dmarcRUA">RUA email (rapportage):</label>
+      <input type="email" id="dmarcRUA" placeholder="mailto:admin@voorbeeld.nl" />
+    </div>
+    <div>
+      <label for="dmarcRUF">RUF email (forensisch rapport):</label>
+      <input type="email" id="dmarcRUF" placeholder="mailto:admin@voorbeeld.nl" />
+    </div>
+  </div>
+
+  <h2>MTA-STS instellingen</h2>
+  <label for="mtaStsDate">Kies de datum voor MTA-STS id:</label>
+  <input type="date" id="mtaStsDate" />
 
   <button id="generateBtn">Genereer records</button>
 
@@ -172,12 +240,24 @@
     });
   }
 
+  function formatDate(date) {
+    // Format YYYYMMDDThhmmssZ (UTC)
+    if (!date) return '';
+    const d = new Date(date);
+    return d.getUTCFullYear().toString().padStart(4, '0') +
+      (d.getUTCMonth() + 1).toString().padStart(2, '0') +
+      d.getUTCDate().toString().padStart(2, '0') + 'T000000Z';
+  }
+
   document.getElementById('generateBtn').addEventListener('click', () => {
     const defaultDomain = document.getElementById('defaultDomain').value.trim();
     const customDomain = document.getElementById('customDomain').value.trim();
+    const dmarcRUA = document.getElementById('dmarcRUA').value.trim();
+    const dmarcRUF = document.getElementById('dmarcRUF').value.trim();
+    const mtaStsDateInput = document.getElementById('mtaStsDate').value;
 
     if (!defaultDomain || !customDomain) {
-      alert('Vul beide domeinen in.');
+      alert('Vul zowel Default domain als Custom domain in.');
       return;
     }
 
@@ -185,10 +265,16 @@
     const dkim1 = `selector1-${customDomain.replace(/\./g, '-')}._domainkey.${defaultDomain}`;
     const dkim2 = `selector2-${customDomain.replace(/\./g, '-')}._domainkey.${defaultDomain}`;
 
-    // MX record
-    const mxValue = defaultDomain.includes('onmicrosoft.com')
-      ? defaultDomain.replace('onmicrosoft.com', 'mail.protection.outlook.com')
-      : 'mail.protection.outlook.com';
+    // MX record uses customDomain.mail.protection.outlook.com
+    const mxValue = `${customDomain}.mail.protection.outlook.com`;
+
+    // Format MTA-STS id date or fallback to today
+    const mtaStsIdDate = mtaStsDateInput ? formatDate(mtaStsDateInput) : formatDate(new Date());
+
+    // Construct DMARC record with optional RUA and RUF tags
+    let dmarcValue = `v=DMARC1; p=none;`;
+    if (dmarcRUA) dmarcValue += ` rua=${dmarcRUA};`;
+    if (dmarcRUF) dmarcValue += ` ruf=${dmarcRUF};`;
 
     // Records data
     const records = {
@@ -206,10 +292,10 @@
         { name: "@", type: "TXT", value: "v=spf1 include:spf.protection.outlook.com -all" }
       ],
       "DMARC Record": [
-        { name: "_dmarc", type: "TXT", value: `v=DMARC1; p=none; rua=mailto:admin@${customDomain}` }
+        { name: "_dmarc", type: "TXT", value: dmarcValue }
       ],
       "MTA-STS Record": [
-        { name: "_mta-sts", type: "TXT", value: "v=STSv1; id=20250527T0000Z" }
+        { name: "_mta-sts", type: "TXT", value: `v=STSv1; id=${mtaStsIdDate}` }
       ]
     };
 
