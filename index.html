@@ -265,7 +265,6 @@
     margin-top: 1rem;
     font-size: 14px;
   }
-  /* Icon styles for buttons */
   svg.icon {
     width: 16px;
     height: 16px;
@@ -370,7 +369,6 @@
     customizeSection.setAttribute('aria-hidden', !isHidden);
     toggleBtn.setAttribute('aria-expanded', isHidden);
     toggleBtn.textContent = (isHidden ? 'Hide Customize' : 'Customize');
-    // Add icon back after text:
     if (isHidden) {
       toggleBtn.innerHTML = '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15.5l-7-7 1.41-1.41L12 12.67l5.59-5.58L19 8.5z"/></svg> Hide Customize';
     } else {
@@ -391,7 +389,6 @@
 
   function copyToClipboard(text) {
     navigator.clipboard.writeText(text);
-    // no alert to keep silent copy
   }
 
   function formatDate(date) {
@@ -505,7 +502,6 @@
           const type = rec.type || (rec.record ? "CNAME" : "TXT");
           const hostname = rec.name;
           const value = rec.record || rec.value || "";
-          // Use two spaces instead of tabs:
           simpleLines.push(`${type}  ${hostname}  ${value}`);
         });
       }
@@ -530,8 +526,7 @@
               <td>${escapeHtml(rec.name)}</td>
               <td><code>${escapeHtml(rec.record)}</code></td>
               <td><button class="copy-btn" onclick="copyToClipboard('${escapeHtml(rec.record)}')" aria-label="Copy record">
-                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
-                Copy
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg> Copy
               </button></td>
             </tr>`;
           });
@@ -542,8 +537,7 @@
               <td>${escapeHtml(rec.name)}</td>
               <td><code>${escapeHtml(rec.value)}</code></td>
               <td><button class="copy-btn" onclick="copyToClipboard('${escapeHtml(rec.value)}')" aria-label="Copy record">
-                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
-                Copy
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg> Copy
               </button></td>
             </tr>`;
           });
@@ -566,24 +560,71 @@
   document.getElementById('generateBtn').addEventListener('click', generateRecords);
 
   exportBtn.addEventListener('click', () => {
-    // Export the extended HTML results as a downloadable file
+    // Export the extended HTML results as a downloadable file with styles
     const extendedHtml = resultsDiv.innerHTML;
     if (!extendedHtml) {
       alert('No records to export. Please generate records first.');
       return;
     }
+    const exportStyles = `
+      body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 1rem; background: #f7f8fb; }
+      h2 { color: #8EAFDA; font-weight: 600; margin-top: 1.5rem; }
+      table {
+        width: 100%; border-collapse: separate; border-spacing: 0 6px; margin-top: 0.5rem;
+        table-layout: fixed;
+        box-shadow: 0 4px 12px rgb(0 0 0 / 0.1);
+        border-radius: 12px;
+        background: white;
+      }
+      th, td {
+        padding: 0.4rem 0.7rem;
+        text-align: left;
+        vertical-align: middle;
+        font-size: 13px;
+        word-break: break-word;
+        overflow-wrap: anywhere;
+      }
+      th {
+        font-weight: 600;
+        color: #555;
+        background: #f0f3f7;
+        border-radius: 6px;
+      }
+      tbody tr {
+        background: #f9fbff;
+        border-radius: 6px;
+      }
+      tbody tr td:first-child {
+        border-top-left-radius: 6px;
+        border-bottom-left-radius: 6px;
+      }
+      tbody tr td:last-child {
+        border-top-right-radius: 6px;
+        border-bottom-right-radius: 6px;
+      }
+      th:nth-child(1), td:nth-child(1) { width: 12%; white-space: nowrap; }
+      th:nth-child(2), td:nth-child(2) { width: 18%; white-space: nowrap; }
+      th:nth-child(3), td:nth-child(3) {
+        width: 58%;
+        font-family: 'Courier New', Courier, monospace;
+        white-space: normal;
+        word-wrap: break-word;
+        background: #f9fbff;
+        padding: 0.4rem 0.7rem;
+      }
+      th:nth-child(4), td:nth-child(4) { width: 12%; text-align: center; vertical-align: middle; }
+      code {
+        background: none !important;
+        padding: 0 !important;
+        display: inline !important;
+        border-radius: 0 !important;
+        font-size: 13px;
+      }
+    `;
     const blob = new Blob([`
       <!DOCTYPE html>
       <html lang="en">
-      <head><meta charset="UTF-8"><title>Exported DNS Records</title>
-      <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 1rem; }
-        table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
-        th, td { border: 1px solid #ddd; padding: 0.5rem; text-align: left; }
-        th { background-color: #8EAFDA; color: white; }
-        code { font-family: monospace; background: none; padding: 0; }
-      </style>
-      </head>
+      <head><meta charset="UTF-8"><title>Exported DNS Records</title><style>${exportStyles}</style></head>
       <body>
       ${extendedHtml}
       </body>
