@@ -452,4 +452,56 @@
     const mode = getSelectedMode();
 
     if (mode === 'simple') {
-      resultsDiv.classList.add
+      resultsDiv.classList.add('simple');
+      let simpleLines = [];
+      for (const section of recordOrder) {
+        const recs = records[section];
+        if (!recs) continue;
+        recs.forEach(rec => {
+          const type = rec.type || (rec.record ? "CNAME" : "TXT");
+          const hostname = rec.name;
+          const value = rec.record || rec.value || "";
+          simpleLines.push(`${type}\t\t${hostname}\t\t${value}`);
+        });
+      }
+      resultsDiv.textContent = simpleLines.join('\n');
+    } else {
+      resultsDiv.classList.remove('simple');
+      let html = '';
+      for (const section of recordOrder) {
+        const recs = records[section];
+        if (!recs) continue;
+        html += `<h2>${section}</h2><table><thead><tr>`;
+        if (section === "DKIM Records") {
+          html += `<th>Name</th><th>TTL</th><th>Record</th><th>Copy</th>`;
+        } else if (section === "MX Record") {
+          // Remove priority column, priority is now in value
+          html += `<th>Name</th><th>Type</th><th>Value</th><th>Copy</th>`;
+        } else {
+          html += `<th>Name</th><th>Type</th><th>Value</th><th>Copy</th>`;
+        }
+        html += `</tr></thead><tbody>`;
+        recs.forEach(rec => {
+          html += `<tr>`;
+          if (section === "DKIM Records") {
+            html += `<td>${escapeHtml(rec.name)}</td><td>${escapeHtml(rec.ttl)}</td><td><code>${escapeHtml(rec.record)}</code></td>`;
+            html += `<td><button class="copy-btn" onclick="copyToClipboard('${escapeHtml(rec.record)}')" aria-label="Copy record">Copy</button></td>`;
+          } else if (section === "MX Record") {
+            html += `<td>${escapeHtml(rec.name)}</td><td>${escapeHtml(rec.type)}</td><td><code>${escapeHtml(rec.value)}</code></td>`;
+            html += `<td><button class="copy-btn" onclick="copyToClipboard('${escapeHtml(rec.value)}')" aria-label="Copy record">Copy</button></td>`;
+          } else {
+            html += `<td>${escapeHtml(rec.name)}</td><td>${escapeHtml(rec.type)}</td><td><code>${escapeHtml(rec.value)}</code></td>`;
+            html += `<td><button class="copy-btn" onclick="copyToClipboard('${escapeHtml(rec.value)}')" aria-label="Copy record">Copy</button></td>`;
+          }
+          html += `</tr>`;
+        });
+        html += `</tbody></table>`;
+      }
+      resultsDiv.innerHTML = html;
+    }
+
+    resultsDiv.focus();
+  });
+</script>
+</body>
+</html>
