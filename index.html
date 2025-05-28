@@ -21,7 +21,7 @@
     max-width: 900px;
     width: 100%;
     padding: 1.25rem 1.5rem;
-    font-size: 14px; /* smaller font */
+    font-size: 14px;
   }
   header {
     text-align: center;
@@ -42,6 +42,12 @@
   h1 {
     font-size: 1.5rem;
     margin-top: 0;
+  }
+  /* Slightly smaller headings in Customize section */
+  #customizeSection h2 {
+    font-size: 0.95rem;
+    margin-top: 1.25rem;
+    margin-bottom: 0.5rem;
   }
   .description {
     font-size: 1rem;
@@ -161,10 +167,15 @@
     border: none;
     color: white;
     font-weight: 600;
-    padding: 0.25rem 0.5rem;
-    border-radius: 6px;
+    width: 48px;
+    height: 24px;
     font-size: 13px;
+    padding: 0;
+    border-radius: 6px;
     transition: background-color 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   .copy-btn:hover {
     background: #6b8ec6;
@@ -178,11 +189,35 @@
     flex: 1;
     min-width: 180px;
   }
+  /* SPF radio buttons side by side */
+  fieldset {
+    margin-top: 1rem;
+    border: none;
+    padding: 0;
+  }
+  fieldset legend {
+    font-weight: 600;
+    color: #444;
+    margin-bottom: 0.5rem;
+  }
+  .spf-options {
+    display: flex;
+    gap: 1.5rem;
+  }
+  .spf-options label {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    cursor: pointer;
+  }
   @media (max-width: 600px) {
     main {
       padding: 1rem 1rem;
     }
     .inline-inputs {
+      flex-direction: column;
+    }
+    .spf-options {
       flex-direction: column;
     }
   }
@@ -270,9 +305,9 @@
     </div>
 
     <h2>SPF Settings</h2>
-    <fieldset style="margin-top: 1rem; border: none; padding: 0;">
-      <legend style="font-weight: 600; color: #444; margin-bottom: 0.5rem;">SPF Fail Type:</legend>
-      <label><input type="radio" name="spfFail" value="hard" checked /> Hardfail (-all)</label><br />
+    <fieldset class="spf-options">
+      <legend>SPF Fail Type:</legend>
+      <label><input type="radio" name="spfFail" value="hard" checked /> Hardfail (-all)</label>
       <label><input type="radio" name="spfFail" value="soft" /> Softfail (~all)</label>
     </fieldset>
   </section>
@@ -304,7 +339,6 @@
   }
 
   function isValidEmail(email) {
-    // Simple email regex (not perfect but good enough)
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return re.test(email);
   }
@@ -337,6 +371,16 @@
     return 'hard';
   }
 
+  // Order of records as requested
+  const recordOrder = [
+    "MX Record",
+    "Autodiscover Record",
+    "SPF Record",
+    "DKIM Records",
+    "DMARC Record",
+    "MTA-STS Record"
+  ];
+
   document.getElementById('generateBtn').addEventListener('click', () => {
     const defaultDomain = document.getElementById('defaultDomain').value.trim();
     const customDomain = document.getElementById('customDomain').value.trim();
@@ -352,7 +396,6 @@
       return;
     }
 
-    // Validate emails if entered
     if (dmarcRUA && !isValidEmail(dmarcRUA)) {
       alert('Please enter a valid RUA email address.');
       return;
@@ -369,37 +412,34 @@
     const dkim1 = `selector1-${customDomain.replace(/\./g, '-')}._domainkey.${defaultDomain}`;
     const dkim2 = `selector2-${customDomain.replace(/\./g, '-')}._domainkey.${defaultDomain}`;
 
-    const mxValue = `${customDomain}.mail.protection.outlook.com`;
+    const mxValue = `0 ${customDomain}.mail.protection.outlook.com`;
 
     const mtaStsIdDate = mtaStsDateInput ? formatDate(mtaStsDateInput) : formatDate(new Date());
 
-    // SPF record value with fail type
     const spfValue = `v=spf1 include:spf.protection.outlook.com ${spfFailType === 'hard' ? '-all' : '~all'}`;
 
-    // Construct DMARC record with optional RUA and RUF tags and policy, add mailto: prefix
     let dmarcValue = `v=DMARC1; p=${dmarcPolicy};`;
     if (dmarcRUA) dmarcValue += ` rua=mailto:${dmarcRUA};`;
     if (dmarcRUF) dmarcValue += ` ruf=mailto:${dmarcRUF};`;
 
-    // Construct MTA-STS record with optional rua email, mailto: prefix
     let mtaStsValue = `v=STSv1; id=${mtaStsIdDate}`;
     if (mtaStsEmail) {
       mtaStsValue += `; rua=mailto:${mtaStsEmail}`;
     }
 
     const records = {
-      "DKIM Records": [
-        { name: "selector1._domainkey", type: "CNAME", ttl: "3600", record: dkim1 },
-        { name: "selector2._domainkey", type: "CNAME", ttl: "3600", record: dkim2 },
-      ],
       "MX Record": [
-        { name: "@", type: "MX", priority: "0", value: mxValue }
+        { name: "@", type: "MX", value: mxValue }
       ],
       "Autodiscover Record": [
         { name: "autodiscover", type: "CNAME", value: "autodiscover.outlook.com" }
       ],
       "SPF Record": [
         { name: "@", type: "TXT", value: spfValue }
+      ],
+      "DKIM Records": [
+        { name: "selector1._domainkey", type: "CNAME", ttl: "3600", record: dkim1 },
+        { name: "selector2._domainkey", type: "CNAME", ttl: "3600", record: dkim2 },
       ],
       "DMARC Record": [
         { name: "_dmarc", type: "TXT", value: dmarcValue }
@@ -412,56 +452,4 @@
     const mode = getSelectedMode();
 
     if (mode === 'simple') {
-      resultsDiv.classList.add('simple');
-      // Simple output with two tabs between fields for spacing
-      let simpleLines = [];
-      for (const recs of Object.values(records)) {
-        recs.forEach(rec => {
-          const type = rec.type || (rec.record ? "CNAME" : "TXT");
-          const hostname = rec.name;
-          const value = rec.record || rec.value || "";
-          simpleLines.push(`${type}\t\t${hostname}\t\t${value}`);
-        });
-      }
-      resultsDiv.textContent = simpleLines.join('\n');
-    } else {
-      resultsDiv.classList.remove('simple');
-      let html = '';
-
-      for (const [section, recs] of Object.entries(records)) {
-        html += `<h2>${section}</h2><table><thead><tr>`;
-        if (section === "DKIM Records") {
-          html += `<th>Name</th><th>TTL</th><th>Record</th><th>Copy</th>`;
-        } else if (section === "MX Record") {
-          html += `<th>Name</th><th>Type</th><th>Priority</th><th>Value</th><th>Copy</th>`;
-        } else {
-          html += `<th>Name</th><th>Type</th><th>Value</th><th>Copy</th>`;
-        }
-        html += `</tr></thead><tbody>`;
-
-        recs.forEach(rec => {
-          html += `<tr>`;
-          if (section === "DKIM Records") {
-            html += `<td>${escapeHtml(rec.name)}</td><td>${escapeHtml(rec.ttl)}</td><td><code>${escapeHtml(rec.record)}</code></td>`;
-            html += `<td><button class="copy-btn" onclick="copyToClipboard('${escapeHtml(rec.record)}')">Copy</button></td>`;
-          } else if (section === "MX Record") {
-            html += `<td>${escapeHtml(rec.name)}</td><td>${escapeHtml(rec.type)}</td><td>${escapeHtml(rec.priority)}</td><td><code>${escapeHtml(rec.value)}</code></td>`;
-            html += `<td><button class="copy-btn" onclick="copyToClipboard('${escapeHtml(rec.value)}')">Copy</button></td>`;
-          } else {
-            html += `<td>${escapeHtml(rec.name)}</td><td>${escapeHtml(rec.type)}</td><td><code>${escapeHtml(rec.value)}</code></td>`;
-            html += `<td><button class="copy-btn" onclick="copyToClipboard('${escapeHtml(rec.value)}')">Copy</button></td>`;
-          }
-          html += `</tr>`;
-        });
-
-        html += `</tbody></table>`;
-      }
-
-      resultsDiv.innerHTML = html;
-    }
-
-    resultsDiv.focus();
-  });
-</script>
-</body>
-</html>
+      resultsDiv.classList.add
