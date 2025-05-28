@@ -45,7 +45,6 @@
     font-size: 1.5rem;
     margin-top: 0;
   }
-  /* Slightly smaller headings in Customize section */
   #customizeSection h2 {
     font-size: 0.95rem;
     margin-top: 1.25rem;
@@ -89,15 +88,18 @@
     border-radius: 8px;
     cursor: pointer;
     transition: background-color 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0.6rem 1rem;
+    border: none;
   }
   button {
     margin-top: 1.5rem;
     width: 100%;
     background-color: #8EAFDA;
-    border: none;
     color: white;
     font-size: 1rem;
-    padding: 0.7rem;
   }
   button:hover {
     background-color: #6b8ec6;
@@ -107,9 +109,7 @@
     background-color: #f9c74f;
     color: #444;
     border: 2px solid #f9c74f;
-    padding: 0.4rem 0.9rem;
     width: auto;
-    display: inline-block;
   }
   .customize-toggle-btn:hover {
     background-color: #e0b732;
@@ -162,8 +162,8 @@
     font-family: 'Courier New', Courier, monospace;
     white-space: normal;
     word-wrap: break-word;
-    background: none; /* remove blue background */
-    padding: 0; /* remove padding to keep inline style */
+    background: #f9fbff;
+    padding: 0.4rem 0.7rem;
   }
   th:nth-child(4), td:nth-child(4) {
     width: 12%;
@@ -171,20 +171,17 @@
     vertical-align: middle;
     padding: 0.4rem 0.7rem;
   }
-
-  /* Center the copy button cell */
   td:last-child {
     vertical-align: middle;
     text-align: center;
     padding: 0.4rem 0.7rem;
   }
-
   code {
     font-family: 'Courier New', Courier, monospace;
-    background: none !important; /* remove background */
-    padding: 0 !important;       /* remove padding */
-    display: inline !important;  /* inline so no block spacing */
-    border-radius: 0 !important; /* remove border radius */
+    background: none !important;
+    padding: 0 !important;
+    display: inline !important;
+    border-radius: 0 !important;
     font-size: 13px;
     white-space: normal;
     word-wrap: break-word;
@@ -196,13 +193,13 @@
     padding: 0;
     border-radius: 6px;
     background: #8EAFDA;
-    border: none;
     color: white;
     font-weight: 600;
     cursor: pointer;
     display: block;
     margin: 0 auto;
     transition: background-color 0.2s ease;
+    border: none;
   }
   .copy-btn:hover {
     background: #6b8ec6;
@@ -268,6 +265,12 @@
     margin-top: 1rem;
     font-size: 14px;
   }
+  /* Icon styles for buttons */
+  svg.icon {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+  }
 </style>
 </head>
 <body>
@@ -294,7 +297,10 @@
     <label><input type="radio" name="mode" value="simple" /> Simple</label>
   </div>
 
-  <button id="toggleCustomize" class="customize-toggle-btn" aria-expanded="false" aria-controls="customizeSection">Customize</button>
+  <button id="toggleCustomize" class="customize-toggle-btn" aria-expanded="false" aria-controls="customizeSection" type="button">
+    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15.5l-7-7 1.41-1.41L12 12.67l5.59-5.58L19 8.5z"/></svg>
+    Customize
+  </button>
 
   <section id="customizeSection" aria-hidden="true">
     <h2>DMARC Settings</h2>
@@ -337,7 +343,15 @@
     </fieldset>
   </section>
 
-  <button id="generateBtn">Generate Records</button>
+  <button id="generateBtn" type="button">
+    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 20h14v-2H5v2zm7-18l-5 5h3v6h4v-6h3l-5-5z"/></svg>
+    Generate Records
+  </button>
+
+  <button id="exportBtn" type="button" style="display:none; background:#4CAF50; margin-top:0.5rem; width:100%;">
+    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 20h14v-2H5v2zm7-18l-5 5h3v6h4v-6h3l-5-5z"/></svg>
+    Export to HTML
+  </button>
 
   <pre id="results" tabindex="0"></pre>
 </main>
@@ -348,13 +362,20 @@
   const resultsDiv = document.getElementById('results');
   const modeRadios = document.querySelectorAll('input[name="mode"]');
   const spfFailRadios = document.querySelectorAll('input[name="spfFail"]');
+  const exportBtn = document.getElementById('exportBtn');
 
   toggleBtn.addEventListener('click', () => {
     const isHidden = customizeSection.style.display === 'none' || customizeSection.style.display === '';
     customizeSection.style.display = isHidden ? 'block' : 'none';
     customizeSection.setAttribute('aria-hidden', !isHidden);
     toggleBtn.setAttribute('aria-expanded', isHidden);
-    toggleBtn.textContent = isHidden ? 'Hide Customize' : 'Customize';
+    toggleBtn.textContent = (isHidden ? 'Hide Customize' : 'Customize');
+    // Add icon back after text:
+    if (isHidden) {
+      toggleBtn.innerHTML = '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15.5l-7-7 1.41-1.41L12 12.67l5.59-5.58L19 8.5z"/></svg> Hide Customize';
+    } else {
+      toggleBtn.innerHTML = '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15.5l-7-7 1.41-1.41L12 12.67l5.59-5.58L19 8.5z"/></svg> Customize';
+    }
   });
 
   function escapeHtml(text) {
@@ -370,7 +391,7 @@
 
   function copyToClipboard(text) {
     navigator.clipboard.writeText(text);
-    // no alert anymore
+    // no alert to keep silent copy
   }
 
   function formatDate(date) {
@@ -404,7 +425,7 @@
     "MTA-STS Record"
   ];
 
-  document.getElementById('generateBtn').addEventListener('click', () => {
+  function generateRecords() {
     const defaultDomain = document.getElementById('defaultDomain').value.trim();
     const customDomain = document.getElementById('customDomain').value.trim();
     const dmarcRUA = document.getElementById('dmarcRUA').value.trim();
@@ -416,20 +437,20 @@
 
     if (!defaultDomain || !customDomain) {
       alert('Please fill in both Default domain and Custom domain.');
-      return;
+      return false;
     }
 
     if (dmarcRUA && !isValidEmail(dmarcRUA)) {
       alert('Please enter a valid RUA email address.');
-      return;
+      return false;
     }
     if (dmarcRUF && !isValidEmail(dmarcRUF)) {
       alert('Please enter a valid RUF email address.');
-      return;
+      return false;
     }
     if (mtaStsEmail && !isValidEmail(mtaStsEmail)) {
       alert('Please enter a valid MTA-STS Report email address.');
-      return;
+      return false;
     }
 
     const dkim1 = `selector1-${customDomain.replace(/\./g, '-')}._domainkey.${defaultDomain}`;
@@ -484,10 +505,12 @@
           const type = rec.type || (rec.record ? "CNAME" : "TXT");
           const hostname = rec.name;
           const value = rec.record || rec.value || "";
-          simpleLines.push(`${type}\t\t${hostname}\t\t${value}`);
+          // Use two spaces instead of tabs:
+          simpleLines.push(`${type}  ${hostname}  ${value}`);
         });
       }
       resultsDiv.textContent = simpleLines.join('\n');
+      exportBtn.style.display = 'none'; // Hide export in simple mode
     } else {
       resultsDiv.classList.remove('simple');
       let html = '';
@@ -506,7 +529,10 @@
               <td>CNAME</td>
               <td>${escapeHtml(rec.name)}</td>
               <td><code>${escapeHtml(rec.record)}</code></td>
-              <td><button class="copy-btn" onclick="copyToClipboard('${escapeHtml(rec.record)}')" aria-label="Copy record">Copy</button></td>
+              <td><button class="copy-btn" onclick="copyToClipboard('${escapeHtml(rec.record)}')" aria-label="Copy record">
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                Copy
+              </button></td>
             </tr>`;
           });
         } else {
@@ -515,16 +541,62 @@
               <td>${escapeHtml(rec.type)}</td>
               <td>${escapeHtml(rec.name)}</td>
               <td><code>${escapeHtml(rec.value)}</code></td>
-              <td><button class="copy-btn" onclick="copyToClipboard('${escapeHtml(rec.value)}')" aria-label="Copy record">Copy</button></td>
+              <td><button class="copy-btn" onclick="copyToClipboard('${escapeHtml(rec.value)}')" aria-label="Copy record">
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                Copy
+              </button></td>
             </tr>`;
           });
         }
         html += `</tbody></table>`;
       }
       resultsDiv.innerHTML = html;
+      exportBtn.style.display = 'inline-flex'; // Show export button in extended mode
     }
 
+    // Close customize section on generate
+    customizeSection.style.display = 'none';
+    customizeSection.setAttribute('aria-hidden', 'true');
+    toggleBtn.setAttribute('aria-expanded', 'false');
+    toggleBtn.innerHTML = '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15.5l-7-7 1.41-1.41L12 12.67l5.59-5.58L19 8.5z"/></svg> Customize';
+
     resultsDiv.focus();
+  }
+
+  document.getElementById('generateBtn').addEventListener('click', generateRecords);
+
+  exportBtn.addEventListener('click', () => {
+    // Export the extended HTML results as a downloadable file
+    const extendedHtml = resultsDiv.innerHTML;
+    if (!extendedHtml) {
+      alert('No records to export. Please generate records first.');
+      return;
+    }
+    const blob = new Blob([`
+      <!DOCTYPE html>
+      <html lang="en">
+      <head><meta charset="UTF-8"><title>Exported DNS Records</title>
+      <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 1rem; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
+        th, td { border: 1px solid #ddd; padding: 0.5rem; text-align: left; }
+        th { background-color: #8EAFDA; color: white; }
+        code { font-family: monospace; background: none; padding: 0; }
+      </style>
+      </head>
+      <body>
+      ${extendedHtml}
+      </body>
+      </html>
+    `], {type: 'text/html'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'Microsoft365-DNS-Records.html';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
   });
 </script>
 </body>
