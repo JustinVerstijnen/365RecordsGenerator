@@ -5,9 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Microsoft 365 DNS Record Generator</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
-
-    body {
+  body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: #f7f8fb;
     color: #222;
@@ -80,41 +78,39 @@
     box-shadow: 0 0 6px #a7c7f9;
   }
 
+  button, .customize-toggle-btn {
+    font-weight: 600;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+
   button {
     margin-top: 2rem;
     width: 100%;
     background-color: #8EAFDA;
     border: none;
     color: white;
-    font-weight: 600;
     font-size: 1.1rem;
     padding: 0.85rem;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
   }
-
   button:hover {
     background-color: #6b8ec6;
   }
 
   .customize-toggle-btn {
     margin-top: 1.5rem;
-    background-color: transparent;
-    color: #8EAFDA;
-    border: 2px solid #8EAFDA;
-    font-weight: 600;
+    background-color: #f9c74f;
+    color: #444;
+    border: 2px solid #f9c74f;
     padding: 0.5rem 1rem;
-    border-radius: 10px;
-    cursor: pointer;
     width: auto;
     display: inline-block;
-    transition: background-color 0.2s ease, color 0.2s ease;
   }
-
   .customize-toggle-btn:hover {
-    background-color: #8EAFDA;
-    color: white;
+    background-color: #e0b732;
+    color: #222;
+    border-color: #e0b732;
   }
 
   #customizeSection {
@@ -204,6 +200,49 @@
       flex-direction: column;
     }
   }
+
+  /* Mode toggle styles */
+  .mode-toggle {
+    margin-top: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  .mode-toggle label {
+    font-weight: 600;
+    color: #444;
+    cursor: pointer;
+  }
+  .mode-toggle input[type="radio"] {
+    margin-right: 0.3rem;
+    cursor: pointer;
+  }
+
+  /* Simple mode list styling */
+  #results.simple ul {
+    list-style: none;
+    padding-left: 0;
+  }
+  #results.simple ul li {
+    background: #f9fbff;
+    margin: 6px 0;
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgb(0 0 0 / 0.05);
+    display: flex;
+    justify-content: space-between;
+    font-family: 'Courier New', Courier, monospace;
+  }
+  #results.simple ul li button.copy-btn {
+    background: #f9c74f;
+    color: #444;
+    padding: 0.3rem 0.6rem;
+    font-weight: 600;
+  }
+  #results.simple ul li button.copy-btn:hover {
+    background: #e0b732;
+    color: #222;
+  }
 </style>
 </head>
 <body>
@@ -221,7 +260,12 @@
   <label for="customDomain">Custom domain (e.g. yourdomain.com):</label>
   <input type="text" id="customDomain" placeholder="example.com" />
 
-  <button id="toggleCustomize" class="customize-toggle-btn">Customize</button>
+  <div class="mode-toggle" aria-label="Select display mode">
+    <label><input type="radio" name="mode" value="extended" checked /> Extended</label>
+    <label><input type="radio" name="mode" value="simple" /> Simple</label>
+  </div>
+
+  <button id="toggleCustomize" class="customize-toggle-btn" aria-expanded="false" aria-controls="customizeSection">Customize</button>
 
   <section id="customizeSection" aria-hidden="true">
     <h2>DMARC Settings</h2>
@@ -251,17 +295,20 @@
 
   <button id="generateBtn">Generate Records</button>
 
-  <div id="results"></div>
+  <div id="results" tabindex="0"></div>
 </main>
 
 <script>
   const toggleBtn = document.getElementById('toggleCustomize');
   const customizeSection = document.getElementById('customizeSection');
+  const resultsDiv = document.getElementById('results');
+  const modeRadios = document.querySelectorAll('input[name="mode"]');
 
   toggleBtn.addEventListener('click', () => {
     const isHidden = customizeSection.style.display === 'none' || customizeSection.style.display === '';
     customizeSection.style.display = isHidden ? 'block' : 'none';
     customizeSection.setAttribute('aria-hidden', !isHidden);
+    toggleBtn.setAttribute('aria-expanded', isHidden);
     toggleBtn.textContent = isHidden ? 'Hide Customize' : 'Customize';
   });
 
@@ -278,12 +325,18 @@
   }
 
   function formatDate(date) {
-    // Format YYYYMMDDThhmmssZ (UTC)
     if (!date) return '';
     const d = new Date(date);
     return d.getUTCFullYear().toString().padStart(4, '0') +
       (d.getUTCMonth() + 1).toString().padStart(2, '0') +
       d.getUTCDate().toString().padStart(2, '0') + 'T000000Z';
+  }
+
+  function getSelectedMode() {
+    for (const radio of modeRadios) {
+      if (radio.checked) return radio.value;
+    }
+    return 'extended';
   }
 
   document.getElementById('generateBtn').addEventListener('click', () => {
@@ -299,22 +352,17 @@
       return;
     }
 
-    // DKIM records
     const dkim1 = `selector1-${customDomain.replace(/\./g, '-')}._domainkey.${defaultDomain}`;
     const dkim2 = `selector2-${customDomain.replace(/\./g, '-')}._domainkey.${defaultDomain}`;
 
-    // MX record uses customDomain.mail.protection.outlook.com
     const mxValue = `${customDomain}.mail.protection.outlook.com`;
 
-    // Format MTA-STS id date or fallback to today
     const mtaStsIdDate = mtaStsDateInput ? formatDate(mtaStsDateInput) : formatDate(new Date());
 
-    // Construct DMARC record with optional RUA and RUF tags and policy
     let dmarcValue = `v=DMARC1; p=${dmarcPolicy};`;
     if (dmarcRUA) dmarcValue += ` rua=${dmarcRUA};`;
     if (dmarcRUF) dmarcValue += ` ruf=${dmarcRUF};`;
 
-    // Records data
     const records = {
       "DKIM Records": [
         { name: "selector1._domainkey", ttl: "3600", record: dkim1 },
@@ -337,38 +385,60 @@
       ]
     };
 
-    let html = '';
+    const mode = getSelectedMode();
 
-    for (const [section, recs] of Object.entries(records)) {
-      html += `<h2>${section}</h2><table><thead><tr>`;
-      if (section === "DKIM Records") {
-        html += `<th>Name</th><th>TTL</th><th>Record</th><th>Copy</th>`;
-      } else if (section === "MX Record") {
-        html += `<th>Name</th><th>Type</th><th>Priority</th><th>Value</th><th>Copy</th>`;
-      } else {
-        html += `<th>Name</th><th>Type</th><th>Value</th><th>Copy</th>`;
+    if (mode === 'simple') {
+      resultsDiv.classList.add('simple');
+      let simpleHtml = '';
+      for (const [section, recs] of Object.entries(records)) {
+        simpleHtml += `<h2>${section}</h2><ul>`;
+        recs.forEach(rec => {
+          let displayValue = '';
+          if (rec.record) displayValue = rec.record;
+          else if (rec.value) displayValue = rec.value;
+          else displayValue = '';
+          simpleHtml += `<li><span>${escapeHtml(rec.name)}</span> <code>${escapeHtml(displayValue)}</code> <button class="copy-btn" onclick="copyToClipboard('${escapeHtml(displayValue)}')">Copy</button></li>`;
+        });
+        simpleHtml += `</ul>`;
       }
-      html += `</tr></thead><tbody>`;
+      resultsDiv.innerHTML = simpleHtml;
+    } else {
+      resultsDiv.classList.remove('simple');
+      let html = '';
 
-      recs.forEach(rec => {
-        html += `<tr>`;
+      for (const [section, recs] of Object.entries(records)) {
+        html += `<h2>${section}</h2><table><thead><tr>`;
         if (section === "DKIM Records") {
-          html += `<td>${escapeHtml(rec.name)}</td><td>${escapeHtml(rec.ttl)}</td><td><code>${escapeHtml(rec.record)}</code></td>`;
-          html += `<td><button class="copy-btn" onclick="copyToClipboard('${escapeHtml(rec.record)}')">Copy</button></td>`;
+          html += `<th>Name</th><th>TTL</th><th>Record</th><th>Copy</th>`;
         } else if (section === "MX Record") {
-          html += `<td>${escapeHtml(rec.name)}</td><td>${escapeHtml(rec.type)}</td><td>${escapeHtml(rec.priority)}</td><td><code>${escapeHtml(rec.value)}</code></td>`;
-          html += `<td><button class="copy-btn" onclick="copyToClipboard('${escapeHtml(rec.value)}')">Copy</button></td>`;
+          html += `<th>Name</th><th>Type</th><th>Priority</th><th>Value</th><th>Copy</th>`;
         } else {
-          html += `<td>${escapeHtml(rec.name)}</td><td>${escapeHtml(rec.type)}</td><td><code>${escapeHtml(rec.value)}</code></td>`;
-          html += `<td><button class="copy-btn" onclick="copyToClipboard('${escapeHtml(rec.value)}')">Copy</button></td>`;
+          html += `<th>Name</th><th>Type</th><th>Value</th><th>Copy</th>`;
         }
-        html += `</tr>`;
-      });
+        html += `</tr></thead><tbody>`;
 
-      html += `</tbody></table>`;
+        recs.forEach(rec => {
+          html += `<tr>`;
+          if (section === "DKIM Records") {
+            html += `<td>${escapeHtml(rec.name)}</td><td>${escapeHtml(rec.ttl)}</td><td><code>${escapeHtml(rec.record)}</code></td>`;
+            html += `<td><button class="copy-btn" onclick="copyToClipboard('${escapeHtml(rec.record)}')">Copy</button></td>`;
+          } else if (section === "MX Record") {
+            html += `<td>${escapeHtml(rec.name)}</td><td>${escapeHtml(rec.type)}</td><td>${escapeHtml(rec.priority)}</td><td><code>${escapeHtml(rec.value)}</code></td>`;
+            html += `<td><button class="copy-btn" onclick="copyToClipboard('${escapeHtml(rec.value)}')">Copy</button></td>`;
+          } else {
+            html += `<td>${escapeHtml(rec.name)}</td><td>${escapeHtml(rec.type)}</td><td><code>${escapeHtml(rec.value)}</code></td>`;
+            html += `<td><button class="copy-btn" onclick="copyToClipboard('${escapeHtml(rec.value)}')">Copy</button></td>`;
+          }
+          html += `</tr>`;
+        });
+
+        html += `</tbody></table>`;
+      }
+
+      resultsDiv.innerHTML = html;
     }
 
-    document.getElementById('results').innerHTML = html;
+    resultsDiv.focus();
   });
 </script>
 </body>
