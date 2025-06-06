@@ -7,4 +7,4 @@ Features
 - Customizing your records
 - Export to HTML
 
-Disclaimer: Microsoft sometimes changes the way how records are generated,so always refer to the Microsoft 365 admin center to double check the accuracy of the records.
+Disclaimer: Microsoft sometimes changes the way how records are generated, so always refer to the Microsoft 365 admin center to double check the accuracy of the records.
