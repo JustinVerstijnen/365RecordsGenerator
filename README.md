@@ -5,7 +5,7 @@ Generate complete DNS configuration records for Microsoft 365 (Office 365) b
 ## Overview
 
 **365RecordsGenerator** is an open-source tool designed to help you automatically generate all necessary DNS records for Microsoft 365 services. It supports both basic and advanced configurations, including MX, SPF, Autodiscover, DKIM, DMARC, and MTA-STS.  
-The tool can be used locally or deployed in serverless environments like Azure Functions.
+The tool can be used locally or deployed in serverless environments like Azure Static Web Apps or Azure Functions.
 
 ## Features
 
