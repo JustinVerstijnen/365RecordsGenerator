@@ -1,9 +1,10 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<meta name="description" content="This is a simple and fast tool to generate and export Microsoft 365 DNS Records." />
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<meta content="This is a simple and fast tool to generate and export Microsoft 365 DNS Records." name="description"/>
 <title>Microsoft 365 DNS Record Generator - justinverstijnen.nl</title>
 <style>
   body {
@@ -317,119 +318,93 @@
 </head>
 <body>
 <main>
-  <header>
-    <a href="https://justinverstijnen.nl" target="_blank" rel="noopener noreferrer" title="Go to justinverstijnen.nl">
-      <img src="https://justinverstijnen.nl/wp-content/uploads/2025/04/cropped-Logo-2.0-Transparant.png" alt="Justin Verstijnen Logo" />
-    </a>
-    <h1 class="title" style="color: black;">Microsoft 365 Records Generator</h1>
-  </header>
-
-  <p class="description">
+<header>
+<a href="https://justinverstijnen.nl" rel="noopener noreferrer" target="_blank" title="Go to justinverstijnen.nl">
+<img alt="Justin Verstijnen Logo" src="https://justinverstijnen.nl/wp-content/uploads/2025/04/cropped-Logo-2.0-Transparant.png"/>
+</a>
+<h1 class="title" style="color: black;">Microsoft 365 Records Generator</h1>
+</header>
+<p class="description">
     Quickly generate Microsoft 365 DNS records for your custom domains including MX, SPF, DKIM, DMARC, and MTA-STS. Customize some advanced settings settings and copy or export your records for configuration and documentation.
   </p>
-
-  <label for="defaultDomainInput">Default Microsoft 365 tenant domain:</label>
-  <div class="input-suffix-wrapper">
-    <input type="text" id="defaultDomainInput" placeholder="yourtenantname" aria-describedby="defaultDomainSuffix" />
-    <div class="input-suffix" id="defaultDomainSuffix">.onmicrosoft.com</div>
-  </div>
-
-  <label for="customDomain">Your custom domain:</label>
-  <input type="text" id="customDomain" placeholder="yourdomain.com" />
-
-  <div class="mode-toggle" aria-label="Select display mode">
-    <label><input type="radio" name="mode" value="extended" checked /> Extended</label>
-    <label><input type="radio" name="mode" value="simple" /> Simple</label>
-  </div>
-
-  <button id="toggleCustomize" class="customize-toggle-btn" aria-expanded="false" aria-controls="customizeSection" type="button">
-    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15.5l-7-7 1.41-1.41L12 12.67l5.59-5.58L19 8.5z"/></svg>
+<label for="defaultDomainInput">Default Microsoft 365 tenant domain:</label>
+<div class="input-suffix-wrapper">
+<input aria-describedby="defaultDomainSuffix" id="defaultDomainInput" placeholder="yourtenantname" type="text"/>
+<div class="input-suffix" id="defaultDomainSuffix">.onmicrosoft.com</div>
+</div>
+<label for="customDomain">Your custom domain:</label>
+<input id="customDomain" placeholder="yourdomain.com" type="text"/>
+<div aria-label="Select display mode" class="mode-toggle">
+<label><input checked="" name="mode" type="radio" value="extended"/> Extended</label>
+<label><input name="mode" type="radio" value="simple"/> Simple</label>
+</div>
+<button aria-controls="customizeSection" aria-expanded="false" class="customize-toggle-btn" id="toggleCustomize" type="button">
+<svg aria-hidden="true" class="icon" viewbox="0 0 24 24"><path d="M12 15.5l-7-7 1.41-1.41L12 12.67l5.59-5.58L19 8.5z"></path></svg>
     Customize
   </button>
-
-  <!-- Customize section START -->
-  <div id="customizeSection" aria-hidden="true" style="display:none;">
-    <div style="display: flex; gap: 2rem; flex-wrap: wrap;">
-      <fieldset style="flex: 1; min-width: 280px;">
-        <legend>DMARC Settings</legend>
-        <label for="dmarcPolicy">DMARC Policy:</label>
-        <select id="dmarcPolicy" name="dmarcPolicy" aria-label="DMARC Policy" style="width: 100%; padding: 0.5rem 0.75rem; font-size: 0.9rem; border: 1.5px solid #d1d9e6; border-radius: 8px; box-sizing: border-box;">
-          <option value="reject" selected>Reject</option>
-          <option value="quarantine">Quarantine</option>
-          <option value="none">None</option>
-        </select>
-        <label for="dmarcRUA">DMARC Aggregation (RUA) email address:</label>
-<label for="dmarcP">DMARC Policy (p):</label>
-<select id="dmarcP" style="width: 100%; padding: 0.5rem 0.75rem; margin-bottom: 0.5rem;">
-  <option value="none">none</option>
-  <option value="quarantine">quarantine</option>
-  <option value="reject">reject</option>
+<!-- Customize section START -->
+<div aria-hidden="true" id="customizeSection" style="display:none;">
+<fieldset style="flex: 1; min-width: 280px;">
+<legend>DMARC Settings</legend>
+<div style="display: flex; gap: 2rem; flex-wrap: wrap;">
+<div style="flex: 1; min-width: 240px;">
+<label for="dmarcPolicy">DMARC Policy:</label>
+<select aria-label="DMARC Policy" id="dmarcPolicy" name="dmarcPolicy" style="width: 100%; padding: 0.5rem 0.75rem; font-size: 0.9rem; border: 1.5px solid #d1d9e6; border-radius: 8px; box-sizing: border-box;">
+<option selected="" value="reject">Reject</option>
+<option value="quarantine">Quarantine</option>
+<option value="none">None</option>
 </select>
-
-<label for="dmarcSP">Subdomain Policy (sp):</label>
-<select id="dmarcSP" style="width: 100%; padding: 0.5rem 0.75rem; margin-bottom: 0.5rem;">
-  <option value="">(inherit from p)</option>
-  <option value="none">none</option>
-  <option value="quarantine">quarantine</option>
-  <option value="reject">reject</option>
+<label for="dmarcRUA">DMARC Aggregation (RUA) email address:</label>
+<input id="dmarcRUA" placeholder="report@domain.com (optional)" style="width: 100%; padding: 0.5rem 0.75rem; font-size: 0.9rem; border: 1.5px solid #d1d9e6; border-radius: 8px; box-sizing: border-box;" type="email"/>
+<label for="dmarcFo">Failure Options (fo):</label>
+<input id="dmarcFo" placeholder="1" style="width: 100%; padding: 0.5rem 0.75rem; font-size: 0.9rem; border: 1.5px solid #d1d9e6; border-radius: 8px; box-sizing: border-box;" type="text"/>
+<label for="dmarcRf">Report Format (rf):</label>
+<input id="dmarcRf" placeholder="afrf" style="width: 100%; padding: 0.5rem 0.75rem; font-size: 0.9rem; border: 1.5px solid #d1d9e6; border-radius: 8px; box-sizing: border-box;" type="text"/>
+</div>
+<div style="flex: 1; min-width: 240px;"><label for="dmarcPct">Percentage (pct):</label><input id="dmarcPct" max="100" min="0" placeholder="100" style="width: 100%; padding: 0.5rem 0.75rem; font-size: 0.9rem; border: 1.5px solid #d1d9e6; border-radius: 8px; box-sizing: border-box;" type="number"/>
+<label for="dmarcRUF">DMARC Forensics (RUF) email address:</label>
+<input id="dmarcRUF" placeholder="forensics@domain.com (optional)" style="width: 100%; padding: 0.5rem 0.75rem; font-size: 0.9rem; border: 1.5px solid #d1d9e6; border-radius: 8px; box-sizing: border-box;" type="email"/>
+<label for="dmarcAdkim">DKIM Alignment (adkim):</label>
+<select id="dmarcAdkim" style="width: 100%; padding: 0.5rem 0.75rem; font-size: 0.9rem; border: 1.5px solid #d1d9e6; border-radius: 8px; box-sizing: border-box;">
+<option value="r">Relaxed (r)</option>
+<option selected="selected" value="s">Strict (s)</option>
 </select>
-
-<label for="dmarcPct">Percentage (pct):</label>
-<input type="number" id="dmarcPct" min="0" max="100" placeholder="100" style="width: 100%; padding: 0.5rem 0.75rem; margin-bottom: 0.5rem;" />
-
-<label for="dmarcAdkim">Alignment for DKIM (adkim):</label>
-<select id="dmarcAdkim" style="width: 100%; padding: 0.5rem 0.75rem; margin-bottom: 0.5rem;">
-  <option value="">(default: relaxed)</option>
-  <option value="r">relaxed</option>
-  <option value="s">strict</option>
+<label for="dmarcAspf">SPF Alignment (aspf):</label>
+<select id="dmarcAspf" style="width: 100%; padding: 0.5rem 0.75rem; font-size: 0.9rem; border: 1.5px solid #d1d9e6; border-radius: 8px; box-sizing: border-box;">
+<option value="r">Relaxed (r)</option>
+<option selected="selected" value="s">Strict (s)</option>
 </select>
-
-<label for="dmarcAspf">Alignment for SPF (aspf):</label>
-<select id="dmarcAspf" style="width: 100%; padding: 0.5rem 0.75rem; margin-bottom: 0.5rem;">
-  <option value="">(default: relaxed)</option>
-  <option value="r">relaxed</option>
-  <option value="s">strict</option>
-</select>        <input type="email" id="dmarcRUA" placeholder="report@domain.com (optional)" style="width: 100%; padding: 0.5rem 0.75rem; font-size: 0.9rem; border: 1.5px solid #d1d9e6; border-radius: 8px; box-sizing: border-box;" />
-        <label for="dmarcRUF">DMARC Forensics (RUF) email address:</label>
-        <input type="email" id="dmarcRUF" placeholder="forensics@domain.com (optional)" style="width: 100%; padding: 0.5rem 0.75rem; font-size: 0.9rem; border: 1.5px solid #d1d9e6; border-radius: 8px; box-sizing: border-box;" />
-      </fieldset>
-
-      <fieldset style="flex: 1; min-width: 280px;">
-        <legend>MTA-STS Settings</legend>
-        <label for="mtaStsDate">MTA-STS ID Date:</label>
-        <input type="date" id="mtaStsDate" style="width: 100%; padding: 0.5rem 0.75rem; font-size: 0.9rem; border: 1.5px solid #d1d9e6; border-radius: 8px; box-sizing: border-box;" />
-        <label for="mtaStsEmail">MTA-STS Report Email:</label>
-        <input type="email" id="mtaStsEmail" placeholder="mta-sts-report@domain.com" style="width: 100%; padding: 0.5rem 0.75rem; font-size: 0.9rem; border: 1.5px solid #d1d9e6; border-radius: 8px; box-sizing: border-box;" />
-      </fieldset>
-    </div>
-
-    <fieldset>
-      <legend>SPF Record Settings</legend>
-      <div class="spf-options">
-        <label><input type="radio" name="spfFail" value="hard" checked /> Hard Fail (-all)</label>
-        <label><input type="radio" name="spfFail" value="soft" /> Soft Fail (~all)</label>
-      </div>
-    </fieldset>
-  </div>
-  <!-- Customize section END -->
-
-  <button id="generateBtn" type="button" aria-label="Generate DNS Records">
-    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-      <path fill="white" d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
-    </svg>
+<div style="margin-top: 1rem;"></div>
+</div>
+</div>
+</fieldset>
+<div style="display: flex; gap: 2rem; flex-wrap: wrap;"><fieldset style="flex: 1; min-width: 280px;">
+<legend>SPF Record Settings</legend>
+<div class="spf-options">
+<label><input checked="" name="spfFail" type="radio" value="hard"/> Hard Fail (-all)</label>
+<label><input name="spfFail" type="radio" value="soft"/> Soft Fail (~all)</label>
+</div>
+</fieldset>
+<fieldset style="flex: 1; min-width: 280px;">
+<legend>MTA-STS Settings</legend>
+<input id="mtaStsDate" style="width: 100%; padding: 0.5rem 0.75rem; font-size: 0.9rem; border: 1.5px solid #d1d9e6; border-radius: 8px; box-sizing: border-box;" type="date" value="2025-07-06"/>
+</fieldset></div>
+</div>
+<!-- Customize section END -->
+<button aria-label="Generate DNS Records" id="generateBtn" type="button">
+<svg aria-hidden="true" class="icon" focusable="false" viewbox="0 0 24 24">
+<path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" fill="white"></path>
+</svg>
     Generate records
   </button>
-
-  <button id="exportBtn" type="button" style="display:none;" aria-label="Export DNS Records">
-    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-      <path fill="white" d="M5 20h14v-2H5v2zm7-18l-5 5h3v6h4v-6h3l-5-5z"/>
-    </svg>
+<button aria-label="Export DNS Records" id="exportBtn" style="display:none;" type="button">
+<svg aria-hidden="true" class="icon" focusable="false" viewbox="0 0 24 24">
+<path d="M5 20h14v-2H5v2zm7-18l-5 5h3v6h4v-6h3l-5-5z" fill="white"></path>
+</svg>
     Export to HTML
   </button>
-
-  <pre id="results" tabindex="0"></pre>
+<pre id="results" tabindex="0"></pre>
 </main>
-
 <script>
   const toggleBtn = document.getElementById('toggleCustomize');
   const customizeSection = document.getElementById('customizeSection');
@@ -495,6 +470,7 @@
   }
 
   const recordOrder = [
+    "AVD Feed Discovery",
     "MX Record",
     "Autodiscover Record",
     "SPF Record",
@@ -546,18 +522,23 @@
 
     const spfValue = `v=spf1 include:spf.protection.outlook.com ${spfFailType === 'hard' ? '-all' : '~all'}`;
 
-const dmarcP = document.getElementById('dmarcP')?.value || 'none';
-const dmarcSP = document.getElementById('dmarcSP')?.value;
-const dmarcPct = document.getElementById('dmarcPct')?.value;
-const dmarcAdkim = document.getElementById('dmarcAdkim')?.value;
-const dmarcAspf = document.getElementById('dmarcAspf')?.value;
+    
+    const dmarcPct = document.getElementById('dmarcPct')?.value;
+    const dmarcAdkim = document.getElementById('dmarcAdkim')?.value;
+    const dmarcAspf = document.getElementById('dmarcAspf')?.value;
+    const dmarcFo = document.getElementById('dmarcFo')?.value.trim();
+    const dmarcRf = document.getElementById('dmarcRf')?.value.trim();
+    const dmarcRi = document.getElementById('dmarcRi')?.value;
 
-let dmarcValue = `v=DMARC1; p=${dmarcP};`;
+let dmarcValue = `v=DMARC1; p=${dmarcPolicy};`;
+    if (dmarcPct && dmarcPct !== '') dmarcValue += ` pct=${dmarcPct};`;
+    if (dmarcAdkim) dmarcValue += ` adkim=${dmarcAdkim};`;
+    if (dmarcAspf) dmarcValue += ` aspf=${dmarcAspf};`;
+    if (dmarcFo) dmarcValue += ` fo=${dmarcFo};`;
+    if (dmarcRf) dmarcValue += ` rf=${dmarcRf};`;
+    if (dmarcRi) dmarcValue += ` ri=${dmarcRi};`;
 
-if (dmarcSP) dmarcValue += ` sp=${dmarcSP};`;
-if (dmarcPct) dmarcValue += ` pct=${dmarcPct};`;
-if (dmarcAdkim) dmarcValue += ` adkim=${dmarcAdkim};`;
-if (dmarcAspf) dmarcValue += ` aspf=${dmarcAspf};`;    if (dmarcRUA) dmarcValue += ` rua=mailto:${dmarcRUA};`;
+    if (dmarcRUA) dmarcValue += ` rua=mailto:${dmarcRUA};`;
     if (dmarcRUF) dmarcValue += ` ruf=mailto:${dmarcRUF};`;
 
     let mtaStsValue = `v=STSv1; id=${mtaStsIdDate}`;
@@ -787,6 +768,17 @@ if (dmarcAspf) dmarcValue += ` aspf=${dmarcAspf};`;    if (dmarcRUA) dmarcValue 
     a.click();
     a.remove();
     URL.revokeObjectURL(url);
+  });
+
+
+  document.addEventListener('keydown', function(event) {
+    if (event.key === 'Enter') {
+      const active = document.activeElement;
+      if (active.tagName === 'INPUT' || active.tagName === 'SELECT') {
+        document.getElementById('generateBtn').click();
+        event.preventDefault();
+      }
+    }
   });
 </script>
 </body>
