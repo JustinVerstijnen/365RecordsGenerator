@@ -359,7 +359,37 @@
           <option value="none">None</option>
         </select>
         <label for="dmarcRUA">DMARC Aggregation (RUA) email address:</label>
-        <input type="email" id="dmarcRUA" placeholder="report@domain.com (optional)" style="width: 100%; padding: 0.5rem 0.75rem; font-size: 0.9rem; border: 1.5px solid #d1d9e6; border-radius: 8px; box-sizing: border-box;" />
+<label for="dmarcP">DMARC Policy (p):</label>
+<select id="dmarcP" style="width: 100%; padding: 0.5rem 0.75rem; margin-bottom: 0.5rem;">
+  <option value="none">none</option>
+  <option value="quarantine">quarantine</option>
+  <option value="reject">reject</option>
+</select>
+
+<label for="dmarcSP">Subdomain Policy (sp):</label>
+<select id="dmarcSP" style="width: 100%; padding: 0.5rem 0.75rem; margin-bottom: 0.5rem;">
+  <option value="">(inherit from p)</option>
+  <option value="none">none</option>
+  <option value="quarantine">quarantine</option>
+  <option value="reject">reject</option>
+</select>
+
+<label for="dmarcPct">Percentage (pct):</label>
+<input type="number" id="dmarcPct" min="0" max="100" placeholder="100" style="width: 100%; padding: 0.5rem 0.75rem; margin-bottom: 0.5rem;" />
+
+<label for="dmarcAdkim">Alignment for DKIM (adkim):</label>
+<select id="dmarcAdkim" style="width: 100%; padding: 0.5rem 0.75rem; margin-bottom: 0.5rem;">
+  <option value="">(default: relaxed)</option>
+  <option value="r">relaxed</option>
+  <option value="s">strict</option>
+</select>
+
+<label for="dmarcAspf">Alignment for SPF (aspf):</label>
+<select id="dmarcAspf" style="width: 100%; padding: 0.5rem 0.75rem; margin-bottom: 0.5rem;">
+  <option value="">(default: relaxed)</option>
+  <option value="r">relaxed</option>
+  <option value="s">strict</option>
+</select>        <input type="email" id="dmarcRUA" placeholder="report@domain.com (optional)" style="width: 100%; padding: 0.5rem 0.75rem; font-size: 0.9rem; border: 1.5px solid #d1d9e6; border-radius: 8px; box-sizing: border-box;" />
         <label for="dmarcRUF">DMARC Forensics (RUF) email address:</label>
         <input type="email" id="dmarcRUF" placeholder="forensics@domain.com (optional)" style="width: 100%; padding: 0.5rem 0.75rem; font-size: 0.9rem; border: 1.5px solid #d1d9e6; border-radius: 8px; box-sizing: border-box;" />
       </fieldset>
@@ -368,6 +398,8 @@
         <legend>MTA-STS Settings</legend>
         <label for="mtaStsDate">MTA-STS ID Date:</label>
         <input type="date" id="mtaStsDate" style="width: 100%; padding: 0.5rem 0.75rem; font-size: 0.9rem; border: 1.5px solid #d1d9e6; border-radius: 8px; box-sizing: border-box;" />
+        <label for="mtaStsEmail">MTA-STS Report Email:</label>
+        <input type="email" id="mtaStsEmail" placeholder="mta-sts-report@domain.com" style="width: 100%; padding: 0.5rem 0.75rem; font-size: 0.9rem; border: 1.5px solid #d1d9e6; border-radius: 8px; box-sizing: border-box;" />
       </fieldset>
     </div>
 
@@ -479,6 +511,7 @@
     const dmarcRUF = document.getElementById('dmarcRUF') ? document.getElementById('dmarcRUF').value.trim() : '';
     const dmarcPolicy = document.getElementById('dmarcPolicy') ? document.getElementById('dmarcPolicy').value : 'reject';
     const mtaStsDateInput = document.getElementById('mtaStsDate') ? document.getElementById('mtaStsDate').value : '';
+    const mtaStsEmail = document.getElementById('mtaStsEmail') ? document.getElementById('mtaStsEmail').value.trim() : '';
     const spfFailType = getSelectedSPFFail();
 
     if (!defaultDomainInput) {
@@ -499,6 +532,8 @@
       alert('Please enter a valid RUF email address.');
       return false;
     }
+    if (mtaStsEmail && !isValidEmail(mtaStsEmail)) {
+      alert('Please enter a valid MTA-STS Report email address.');
       return false;
     }
 
@@ -511,11 +546,23 @@
 
     const spfValue = `v=spf1 include:spf.protection.outlook.com ${spfFailType === 'hard' ? '-all' : '~all'}`;
 
-    let dmarcValue = `v=DMARC1; p=${dmarcPolicy};`;
-    if (dmarcRUA) dmarcValue += ` rua=mailto:${dmarcRUA};`;
+const dmarcP = document.getElementById('dmarcP')?.value || 'none';
+const dmarcSP = document.getElementById('dmarcSP')?.value;
+const dmarcPct = document.getElementById('dmarcPct')?.value;
+const dmarcAdkim = document.getElementById('dmarcAdkim')?.value;
+const dmarcAspf = document.getElementById('dmarcAspf')?.value;
+
+let dmarcValue = `v=DMARC1; p=${dmarcP};`;
+
+if (dmarcSP) dmarcValue += ` sp=${dmarcSP};`;
+if (dmarcPct) dmarcValue += ` pct=${dmarcPct};`;
+if (dmarcAdkim) dmarcValue += ` adkim=${dmarcAdkim};`;
+if (dmarcAspf) dmarcValue += ` aspf=${dmarcAspf};`;    if (dmarcRUA) dmarcValue += ` rua=mailto:${dmarcRUA};`;
     if (dmarcRUF) dmarcValue += ` ruf=mailto:${dmarcRUF};`;
 
     let mtaStsValue = `v=STSv1; id=${mtaStsIdDate}`;
+    if (mtaStsEmail) {
+      mtaStsValue += `; rua=mailto:${mtaStsEmail}`;
     }
 
     const records = {
