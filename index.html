@@ -368,8 +368,6 @@
         <legend>MTA-STS Settings</legend>
         <label for="mtaStsDate">MTA-STS ID Date:</label>
         <input type="date" id="mtaStsDate" style="width: 100%; padding: 0.5rem 0.75rem; font-size: 0.9rem; border: 1.5px solid #d1d9e6; border-radius: 8px; box-sizing: border-box;" />
-        <label for="mtaStsEmail">MTA-STS Report Email:</label>
-        <input type="email" id="mtaStsEmail" placeholder="mta-sts-report@domain.com" style="width: 100%; padding: 0.5rem 0.75rem; font-size: 0.9rem; border: 1.5px solid #d1d9e6; border-radius: 8px; box-sizing: border-box;" />
       </fieldset>
     </div>
 
@@ -481,7 +479,6 @@
     const dmarcRUF = document.getElementById('dmarcRUF') ? document.getElementById('dmarcRUF').value.trim() : '';
     const dmarcPolicy = document.getElementById('dmarcPolicy') ? document.getElementById('dmarcPolicy').value : 'reject';
     const mtaStsDateInput = document.getElementById('mtaStsDate') ? document.getElementById('mtaStsDate').value : '';
-    const mtaStsEmail = document.getElementById('mtaStsEmail') ? document.getElementById('mtaStsEmail').value.trim() : '';
     const spfFailType = getSelectedSPFFail();
 
     if (!defaultDomainInput) {
@@ -502,8 +499,6 @@
       alert('Please enter a valid RUF email address.');
       return false;
     }
-    if (mtaStsEmail && !isValidEmail(mtaStsEmail)) {
-      alert('Please enter a valid MTA-STS Report email address.');
       return false;
     }
 
@@ -521,8 +516,6 @@
     if (dmarcRUF) dmarcValue += ` ruf=mailto:${dmarcRUF};`;
 
     let mtaStsValue = `v=STSv1; id=${mtaStsIdDate}`;
-    if (mtaStsEmail) {
-      mtaStsValue += `; rua=mailto:${mtaStsEmail}`;
     }
 
     const records = {
