@@ -38,6 +38,10 @@
           <span class="stepper-index">4</span>
           <span class="stepper-text">MTA-STS (optional)</span>
         </button>
+        <button class="stepper-step" type="button" role="listitem" data-step-jump="4">
+          <span class="stepper-index">5</span>
+          <span class="stepper-text">SMTP DANE</span>
+        </button>
       </div>
 
       <div class="step" data-step="0" aria-label="Step 1: Domains">
@@ -188,10 +192,48 @@
 
         <div class="learn-more-wrap"><a class="learn-more-btn" href="https://justinverstijnen.nl/what-is-mta-sts-and-how-to-protect-your-email-flow/" target="_blank" rel="noopener noreferrer" aria-label="Learn more about MTA-STS"><span class="icon" aria-hidden="true"><i class="fa-solid fa-book"></i></span>Learn more</a></div>
 
-        <div class="actions">
-          <button class="nav" id="step4Back" type="button">← Back</button>
+        <div class="step-actions">
+          <button class="nav" id="step4Back" type="button"><i class="fa-solid fa-arrow-left"></i> Back</button>
+          <button class="nav" id="step4Next" type="button">Next <i class="fa-solid fa-arrow-right"></i></button>
+        </div>
+      </div>
+
+      <div class="step" data-step="4" aria-label="Step 5: SMTP DANE" hidden>
+        <h2 class="section-title">Step 5: SMTP DANE commands</h2>
+
+        <fieldset>
+          <legend>SMTP DANE</legend>
+          <p style="margin-top:0; color:#555;">Use the following PowerShell commands to enable DNSSEC and SMTP DANE for your verified domain.</p>
+
+          <div class="field" style="margin-top:12px;">
+            <label for="smtpDaneCmdDnssec">Enable DNSSEC command</label>
+            <div class="command-box" aria-label="Enable DNSSEC command">
+              <input class="command-input" id="smtpDaneCmdDnssec" type="text" readonly />
+              <button class="copy-btn copy-commands" id="copySmtpDaneCmdDnssec" type="button" aria-label="Copy DNSSEC command" title="Copy">
+                <span class="sr-only">Copy</span>
+                <i class="fa-solid fa-copy" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="field" style="margin-top:12px;">
+            <label for="smtpDaneCmdInbound">Enable SMTP DANE inbound command</label>
+            <div class="command-box" aria-label="Enable SMTP DANE inbound command">
+              <input class="command-input" id="smtpDaneCmdInbound" type="text" readonly />
+              <button class="copy-btn copy-commands" id="copySmtpDaneCmdInbound" type="button" aria-label="Copy SMTP DANE inbound command" title="Copy">
+                <span class="sr-only">Copy</span>
+                <i class="fa-solid fa-copy" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+        </fieldset>
+
+        <div class="learn-more-wrap"><a class="learn-more-btn" href="https://justinverstijnen.nl/configure-dnssec-and-smtp-dane-with-exchange-online-microsoft-365" target="_blank" rel="noopener noreferrer" aria-label="Learn more about DNSSEC and SMTP DANE"><span class="icon" aria-hidden="true"><i class="fa-solid fa-book"></i></span>Learn more</a></div>
+
+        <div class="step-actions">
+          <button class="nav" id="step5Back" type="button"><i class="fa-solid fa-arrow-left"></i> Back</button>
           <button id="generateBtn" type="button"><i class="fas fa-check-circle"></i>Generate records</button>
-</div>
+        </div>
       </div>
     </div>
     <div class="results" id="results"></div>

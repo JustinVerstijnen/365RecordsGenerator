@@ -9,6 +9,8 @@
     step3Back: document.getElementById('step3Back'),
     step3Next: document.getElementById('step3Next'),
     step4Back: document.getElementById('step4Back'),
+    step4Next: document.getElementById('step4Next'),
+    step5Back: document.getElementById('step5Back'),
 
     // Inputs
     defaultDomainInput: document.getElementById('defaultDomainInput'),
@@ -30,6 +32,11 @@
     mtaStsFields: document.getElementById('mtaStsFields'),
     mtaStsDate: document.getElementById('mtaStsDate'),
     mtaStsEmail: document.getElementById('mtaStsEmail'),
+
+    smtpDaneCmdDnssec: document.getElementById('smtpDaneCmdDnssec'),
+    smtpDaneCmdInbound: document.getElementById('smtpDaneCmdInbound'),
+    copySmtpDaneCmdDnssec: document.getElementById('copySmtpDaneCmdDnssec'),
+    copySmtpDaneCmdInbound: document.getElementById('copySmtpDaneCmdInbound'),
 
     generateBtn: document.getElementById('generateBtn'),
     exportBtn: document.getElementById('exportBtn'),
@@ -201,6 +208,27 @@
     }
 
     return true;
+  }
+
+  function validateStep5() {
+    // SMTP DANE step: nothing extra to validate (domain validation is in Step 1)
+    return true;
+  }
+
+  function buildSmtpDaneCommands(customDomain) {
+    const domain = String(customDomain || '').trim();
+    const safeDomain = domain || '<yourdomain.com>';
+    return {
+      dnssec: `Enable-DnssecForVerifiedDomain -DomainName ${safeDomain}`,
+      inbound: `Enable-SmtpDaneInbound -DomainName ${safeDomain}`
+    };
+  }
+
+  function updateSmtpDaneCommands() {
+    const domain = els.customDomain?.value || '';
+    const cmds = buildSmtpDaneCommands(domain);
+    if (els.smtpDaneCmdDnssec) els.smtpDaneCmdDnssec.value = cmds.dnssec;
+    if (els.smtpDaneCmdInbound) els.smtpDaneCmdInbound.value = cmds.inbound;
   }
 
   function buildRows(recordsBySection, recordOrder) {
@@ -433,6 +461,7 @@ ${bodyHtml}
     if (!validateStep2()) return;
     if (!validateStep3()) return;
     if (!validateStep4()) return;
+    if (!validateStep5()) return;
 
     const out = generateRecords();
     lastGenerated = out;
@@ -466,6 +495,13 @@ ${bodyHtml}
   });
 
   els.step4Back?.addEventListener('click', () => showStep(2));
+  els.step4Next?.addEventListener('click', () => {
+    if (!validateStep4()) return;
+    updateSmtpDaneCommands();
+    showStep(4);
+  });
+
+  els.step5Back?.addEventListener('click', () => showStep(3));
 
   // Stepper click (only allow jumping backwards freely; forwards requires validation)
   els.stepperSteps.forEach(btn => {
@@ -482,8 +518,23 @@ ${bodyHtml}
       if (target >= 1 && !validateStep1()) return;
       if (target >= 2 && !validateStep2()) return;
       if (target >= 3 && !validateStep3()) return;
+      if (target >= 4 && !validateStep4()) return;
       showStep(target);
     });
+  });
+
+  // Keep SMTP DANE commands in sync with the custom domain
+  els.customDomain?.addEventListener('input', () => updateSmtpDaneCommands());
+  els.customDomain?.addEventListener('blur', () => updateSmtpDaneCommands());
+
+  els.copySmtpDaneCmdDnssec?.addEventListener('click', () => {
+    const txt = els.smtpDaneCmdDnssec?.value || '';
+    copyToClipboard(txt, els.copySmtpDaneCmdDnssec);
+  });
+
+  els.copySmtpDaneCmdInbound?.addEventListener('click', () => {
+    const txt = els.smtpDaneCmdInbound?.value || '';
+    copyToClipboard(txt, els.copySmtpDaneCmdInbound);
   });
 
   // Auto-correct the tenant input so the suffix isn't duplicated visually
@@ -534,6 +585,10 @@ ${bodyHtml}
       return;
     }
     if (currentStep === 3) {
+      els.step4Next?.click();
+      return;
+    }
+    if (currentStep === 4) {
       els.generateBtn?.click();
       return;
     }
@@ -551,5 +606,6 @@ ${bodyHtml}
   // Initial state
   showStep(0);
   setMtaFieldsEnabled(false);
+  updateSmtpDaneCommands();
   if (els.exportBtn) els.exportBtn.style.display = 'none';
 })();
