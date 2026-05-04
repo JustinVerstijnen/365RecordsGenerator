@@ -16,6 +16,7 @@ The main features of this tool are:
   - **DMARC** (Domain-based Message Authentication, Reporting, and Conformance)
   - **MTA-STS** (Mail Transfer Agent Strict Transport Security)
 - Customizable output and record selection
+- Generates the [PowerShell commands needed for SMTP DANE](https://justinverstijnen.nl/configure-dnssec-and-smtp-dane-with-exchange-online-microsoft-365/)
 - Export DNS configuration as a clean HTML report
 
 ## Hosting
