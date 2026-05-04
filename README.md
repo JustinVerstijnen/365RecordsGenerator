@@ -1,13 +1,12 @@
 # 365RecordsGenerator
 
-Generate complete DNS configuration records for Microsoft 365 (Office 365) based on your domain and tenant information.
+365RecordsGenerator is a lightweight and web-based DNS record generator for configuring Microsoft 365 domains created by Justin Verstijnen. This tool can be used to generate all needed records and export these records for quick configuration. It does it by take every neede DNS record into account for the highest domain and email security.
 
-## Overview
+However the tool is great and worked perfectly till some time ago, the record-text generation for MX and DKIM is random from 2025 till now, so double check these records in your admin center.
 
-**365RecordsGenerator** is an open-source tool designed to help you automatically generate all necessary DNS records for Microsoft 365 services. It supports both basic and advanced configurations, including MX, SPF, Autodiscover, DKIM, DMARC, and MTA-STS.  
-The tool can be used locally or deployed in serverless environments like Azure Static Web Apps or Azure Functions.
+## Main features
 
-## Features
+The main features of this tool are:
 
 - Generate all required DNS records for Microsoft 365 setup:
   - **MX** (Mail Exchange)
@@ -19,5 +18,31 @@ The tool can be used locally or deployed in serverless environments like Azure S
 - Customizable output and record selection
 - Export DNS configuration as a clean HTML report
 
-Please note that records can be generated differently for some domains. Refer the domain settings in Microsoft 365 admin center to double check the values. For most domains, this tool will work properly.
+## Hosting
 
+This tool is currently hosted on GitHub Pages. Configuration changes are pushed and built using the default deployment method.
+
+## Technical Architecture
+
+- **Languages** : HTML, CSS, Javascript
+- **Platform** : GitHub Pages
+- **Runtime model** : Serverless
+- **Dependencies** : None
+
+## Changelog/new features
+
+New features to this tool are added when needed or if the tool is broken.
+
+Feature request can be done by submitting issues into GitHub.
+
+## Issues
+
+Its possible to submit any issues using the GitHub issues system.
+
+At this moment, this tool has no known issues.
+
+## License
+
+This project is licensed under the **MIT license**. This means that the software is open source and can be used to run the tool yourself.
+
+Use at your own risk. No guarantees or official support are provided.
