@@ -37,7 +37,7 @@
         </button>
         <button class="stepper-step" type="button" role="listitem" data-step-jump="3">
           <span class="stepper-index">4</span>
-          <span class="stepper-text">MTA-STS (optional)</span>
+          <span class="stepper-text">MTA-STS / TLS-RPT (optional)</span>
         </button>
         <button class="stepper-step" type="button" role="listitem" data-step-jump="4">
           <span class="stepper-index">5</span>
@@ -167,8 +167,8 @@
         </div>
       </div>
 
-      <div class="step" data-step="3" aria-label="Step 4: MTA-STS" hidden>
-        <h2 class="section-title">Step 4: MTA-STS (optional)</h2>
+      <div class="step" data-step="3" aria-label="Step 4: MTA-STS and TLS-RPT" hidden>
+        <h2 class="section-title">Step 4: MTA-STS / TLS-RPT (optional)</h2>
 
         <fieldset>
           <legend>MTA-STS</legend>
@@ -188,6 +188,21 @@
               <label for="mtaStsEmail">MTA-STS report email (rua)</label>
               <input id="mtaStsEmail" type="email" placeholder="report@domain.com (optional)" />
             </div>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>TLS-RPT</legend>
+          <div class="field">
+            <label class="checkbox">
+              <input id="tlsRptEnabled" type="checkbox" />
+              Enable TLS-RPT DNS record
+            </label>
+          </div>
+
+          <div class="field" id="tlsRptFields" aria-label="TLS-RPT options">
+            <label for="tlsRptEmail">TLS-RPT report email address (rua)</label>
+            <input id="tlsRptEmail" type="email" placeholder="reports@domain.com" />
           </div>
         </fieldset>
 

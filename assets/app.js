@@ -33,6 +33,10 @@
     mtaStsDate: document.getElementById('mtaStsDate'),
     mtaStsEmail: document.getElementById('mtaStsEmail'),
 
+    tlsRptEnabled: document.getElementById('tlsRptEnabled'),
+    tlsRptFields: document.getElementById('tlsRptFields'),
+    tlsRptEmail: document.getElementById('tlsRptEmail'),
+
     smtpDaneCmdDnssec: document.getElementById('smtpDaneCmdDnssec'),
     smtpDaneCmdInbound: document.getElementById('smtpDaneCmdInbound'),
     copySmtpDaneCmdDnssec: document.getElementById('copySmtpDaneCmdDnssec'),
@@ -154,6 +158,14 @@
     });
   }
 
+  function setTlsRptFieldsEnabled(enabled) {
+    if (!els.tlsRptFields) return;
+    els.tlsRptFields.style.opacity = enabled ? '1' : '0.55';
+    els.tlsRptFields.querySelectorAll('input').forEach(inp => {
+      inp.disabled = !enabled;
+    });
+  }
+
   function validateStep1() {
     const defaultDomainInput = els.defaultDomainInput.value.trim();
     const customDomain = els.customDomain.value.trim();
@@ -198,12 +210,26 @@
   }
 
   function validateStep4() {
-    const enabled = !!els.mtaStsEnabled?.checked;
+    const mtaEnabled = !!els.mtaStsEnabled?.checked;
     const mtaStsEmail = els.mtaStsEmail?.value.trim() || '';
+    const tlsRptEnabled = !!els.tlsRptEnabled?.checked;
+    const tlsRptEmail = els.tlsRptEmail?.value.trim() || '';
 
-    if (enabled && mtaStsEmail && !isValidEmail(mtaStsEmail)) {
+    if (mtaEnabled && mtaStsEmail && !isValidEmail(mtaStsEmail)) {
       alert('Please enter a valid MTA-STS report email address.');
       els.mtaStsEmail.focus();
+      return false;
+    }
+
+    if (tlsRptEnabled && !tlsRptEmail) {
+      alert('Please enter a TLS-RPT report email address.');
+      els.tlsRptEmail.focus();
+      return false;
+    }
+
+    if (tlsRptEnabled && !isValidEmail(tlsRptEmail)) {
+      alert('Please enter a valid TLS-RPT report email address.');
+      els.tlsRptEmail.focus();
       return false;
     }
 
@@ -301,6 +327,8 @@
     const mtaEnabled = !!els.mtaStsEnabled?.checked;
     const mtaStsDateInput = els.mtaStsDate?.value || '';
     const mtaStsEmail = els.mtaStsEmail?.value.trim() || '';
+    const tlsRptEnabled = !!els.tlsRptEnabled?.checked;
+    const tlsRptEmail = els.tlsRptEmail?.value.trim() || '';
 
     const dkimTenantPart = customDomain.replace(/\./g, '-');
     const dkim1 = `selector1-${dkimTenantPart}._domainkey.${defaultDomain}`;
@@ -325,6 +353,8 @@
       mtaStsValue = `v=STSv1; id=${mtaStsIdDate}`;
       if (mtaStsEmail) mtaStsValue += `; rua=mailto:${mtaStsEmail}`;
     }
+
+    const tlsRptValue = `v=TLSRPTv1; rua=mailto:${tlsRptEmail};`;
 
     const records = {
       'MX Record*': [
@@ -360,7 +390,14 @@
       recordOrder.push('MTA-STS Record');
     }
 
-    return { records, recordOrder, defaultDomain, customDomain, mtaEnabled };
+    if (tlsRptEnabled) {
+      records['TLS-RPT Record'] = [
+        { type: 'TXT', name: '_smtp._tls', value: tlsRptValue }
+      ];
+      recordOrder.push('TLS-RPT Record');
+    }
+
+    return { records, recordOrder, defaultDomain, customDomain, mtaEnabled, tlsRptEnabled };
   }
 
   function exportToHtml(out) {
@@ -549,6 +586,11 @@ ${bodyHtml}
     setMtaFieldsEnabled(!!els.mtaStsEnabled.checked);
   });
 
+  // TLS-RPT toggle
+  els.tlsRptEnabled?.addEventListener('change', () => {
+    setTlsRptFieldsEnabled(!!els.tlsRptEnabled.checked);
+  });
+
   // Generate / Export
   els.generateBtn?.addEventListener('click', handleGenerate);
 
@@ -606,6 +648,7 @@ ${bodyHtml}
   // Initial state
   showStep(0);
   setMtaFieldsEnabled(false);
+  setTlsRptFieldsEnabled(false);
   updateSmtpDaneCommands();
   if (els.exportBtn) els.exportBtn.style.display = 'none';
 })();
