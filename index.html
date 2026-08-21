@@ -75,7 +75,10 @@
         </div>
 
         <fieldset>
-          <legend>2.1 SPF</legend>
+          <legend class="legend-row">
+            <span>2.1 SPF</span>
+            <a class="doc-link" href="https://justinverstijnen.nl/enhance-email-security-with-spf-dkim-dmarc/#spf" target="_blank" rel="noopener noreferrer" aria-label="Learn more about SPF"><i class="fa-solid fa-book" aria-hidden="true"></i> Learn more</a>
+          </legend>
           <div class="spf-options" role="radiogroup" aria-label="SPF failure mode">
             <label><input type="radio" name="spfFail" value="hard" checked /> Hard Fail (-all)</label>
             <label><input type="radio" name="spfFail" value="soft" /> Soft Fail (~all)</label>
@@ -83,7 +86,10 @@
         </fieldset>
 
         <fieldset>
-          <legend>2.2 DMARC</legend>
+          <legend class="legend-row">
+            <span>2.2 DMARC</span>
+            <a class="doc-link" href="https://justinverstijnen.nl/enhance-email-security-with-spf-dkim-dmarc/#dmarc" target="_blank" rel="noopener noreferrer" aria-label="Learn more about DMARC"><i class="fa-solid fa-book" aria-hidden="true"></i> Learn more</a>
+          </legend>
           <div class="field">
             <label for="dmarcPolicy">DMARC Policy</label>
             <select id="dmarcPolicy" name="dmarcPolicy" aria-label="DMARC Policy">
@@ -152,7 +158,10 @@
         </fieldset>
 
         <fieldset>
-          <legend>2.3 SMTP DANE</legend>
+          <legend class="legend-row">
+            <span>2.3 SMTP DANE</span>
+            <a class="doc-link" href="https://justinverstijnen.nl/configure-dnssec-and-smtp-dane-with-exchange-online-microsoft-365" target="_blank" rel="noopener noreferrer" aria-label="Learn more about SMTP DANE"><i class="fa-solid fa-book" aria-hidden="true"></i> Learn more</a>
+          </legend>
           <p class="section-help">Use the following PowerShell commands to enable DNSSEC and SMTP DANE for your verified domain.</p>
 
           <div class="field command-field">
@@ -179,7 +188,10 @@
         </fieldset>
 
         <fieldset>
-          <legend>2.4 MTA-STS</legend>
+          <legend class="legend-row">
+            <span>2.4 MTA-STS</span>
+            <a class="doc-link" href="https://justinverstijnen.nl/what-is-mta-sts-and-how-to-protect-your-email-flow/" target="_blank" rel="noopener noreferrer" aria-label="Learn more about MTA-STS"><i class="fa-solid fa-book" aria-hidden="true"></i> Learn more</a>
+          </legend>
           <div class="field">
             <label class="checkbox">
               <input id="mtaStsEnabled" type="checkbox" />
@@ -198,11 +210,6 @@
           </div>
         </fieldset>
 
-        <div class="learn-more-wrap">
-          <a class="learn-more-btn" href="https://justinverstijnen.nl/enhance-email-security-with-spf-dkim-dmarc/" target="_blank" rel="noopener noreferrer" aria-label="Learn more about email security">
-            <span class="icon" aria-hidden="true"><i class="fa-solid fa-book"></i></span>Learn more
-          </a>
-        </div>
         <div class="section-jump">
           <button type="button" data-scroll-next="monitoring" aria-label="Go to Monitoring"><i class="fa-solid fa-arrow-down" aria-hidden="true"></i></button>
         </div>

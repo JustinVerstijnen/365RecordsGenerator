@@ -216,6 +216,10 @@ h1 {
   border-bottom: 0;
 }
 
+#domains {
+  min-height: 0;
+}
+
 .section-heading {
   margin-bottom: 18px;
 }
@@ -321,6 +325,37 @@ fieldset + fieldset,
 
 legend {
   padding: 0 6px;
+}
+
+legend.legend-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.doc-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 28px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: rgba(119, 176, 222, 0.14);
+  color: #336991;
+  border: 1px solid rgba(119, 176, 222, 0.32);
+  text-decoration: none;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.doc-link:hover {
+  background: rgba(119, 176, 222, 0.23);
+  color: #234e70;
+}
+
+.doc-link i {
+  font-size: 12px;
 }
 
 .spf-options {
