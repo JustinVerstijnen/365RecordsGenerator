@@ -84,8 +84,13 @@ button:disabled {
 }
 
 .page-shell {
-  width: min(1100px, calc(100% - 28px));
-  margin: 34px auto 24px;
+  width: min(900px, calc(100% - 28px));
+  margin: 26px auto 24px;
+  padding: 20px 24px 18px;
+  background: rgba(244, 246, 250, 0.94);
+  border: 1px solid rgba(255, 255, 255, 0.76);
+  border-radius: 8px;
+  box-shadow: 0 18px 48px rgba(17, 24, 39, 0.12);
 }
 
 .header {
@@ -94,12 +99,12 @@ button:disabled {
   align-items: center;
   justify-content: center;
   gap: 10px;
-  margin-bottom: 16px;
-  padding: 24px 20px;
-  background: rgba(229, 231, 235, 0.92);
-  border: 1px solid rgba(209, 213, 219, 0.88);
-  border-radius: 8px;
-  box-shadow: 0 10px 28px rgba(17, 24, 39, 0.1);
+  margin-bottom: 14px;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
   text-align: center;
 }
 
@@ -141,7 +146,7 @@ h1 {
 
 .stepper-track {
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 8px;
   padding: 8px;
   background: rgba(255, 255, 255, 0.82);
@@ -192,11 +197,11 @@ h1 {
 }
 
 .container {
-  background: var(--surface);
-  border: 1px solid rgba(217, 221, 230, 0.72);
-  border-radius: 8px;
-  box-shadow: var(--shadow);
-  overflow: clip;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  overflow: visible;
 }
 
 .tool-section {
@@ -635,7 +640,7 @@ td {
   padding: 13px 12px;
   border-bottom: 1px solid #e5e7eb;
   text-align: left;
-  vertical-align: top;
+  vertical-align: middle;
   word-break: break-word;
 }
 
@@ -646,7 +651,7 @@ th {
 }
 
 th:nth-child(1) {
-  width: 21%;
+  width: 20%;
 }
 
 th:nth-child(2) {
@@ -658,7 +663,11 @@ th:nth-child(3) {
 }
 
 th:nth-child(4) {
-  width: 22%;
+  width: 24%;
+}
+
+th:nth-child(5) {
+  width: 37%;
 }
 
 tbody tr:nth-child(even) {
@@ -686,14 +695,20 @@ tbody tr:last-child td {
 }
 
 .copy-cell {
+  vertical-align: middle;
+}
+
+.copy-cell-content {
+  min-height: 34px;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: 10px;
 }
 
-.copy-cell code {
+.copy-cell-content code {
   min-width: 0;
+  flex: 1 1 auto;
   color: #111827;
   font-family: "Segoe UI", Arial, sans-serif;
   font-size: 0.92rem;
@@ -787,8 +802,9 @@ button.success:hover {
 
 @media (max-width: 620px) {
   .page-shell {
-    width: min(100% - 18px, 1100px);
+    width: min(100% - 18px, 900px);
     margin-top: 18px;
+    padding: 16px 14px;
   }
 
   .stepper {

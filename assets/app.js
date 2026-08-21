@@ -192,14 +192,14 @@
     if (rua && !isValidEmail(rua)) {
       alert('Please enter a valid RUA email address.');
       els.dmarcRUA.focus();
-      scrollToSection('dmarc');
+      scrollToSection('security');
       return false;
     }
 
     if (ruf && !isValidEmail(ruf)) {
       alert('Please enter a valid RUF email address.');
       els.dmarcRUF.focus();
-      scrollToSection('dmarc');
+      scrollToSection('security');
       return false;
     }
 
@@ -215,21 +215,21 @@
     if (mtaEnabled && mtaEmail && !isValidEmail(mtaEmail)) {
       alert('Please enter a valid MTA-STS report email address.');
       els.mtaStsEmail.focus();
-      scrollToSection('optional-records');
+      scrollToSection('security');
       return false;
     }
 
     if (tlsEnabled && !tlsEmail) {
       alert('Please enter a TLS-RPT report email address.');
       els.tlsRptEmail.focus();
-      scrollToSection('optional-records');
+      scrollToSection('monitoring');
       return false;
     }
 
     if (tlsEnabled && !isValidEmail(tlsEmail)) {
       alert('Please enter a valid TLS-RPT report email address.');
       els.tlsRptEmail.focus();
-      scrollToSection('optional-records');
+      scrollToSection('monitoring');
       return false;
     }
 
@@ -278,12 +278,16 @@
       <td>${escapeHtml(record.type)}</td>
       <td>${escapeHtml(record.ttl)}</td>
       <td class="copy-cell">
-        <code>${escapeHtml(record.name)}</code>
-        <button class="copy-btn table-copy" type="button" data-copy-index="${index}" data-copy-field="name" aria-label="Copy ${escapeHtml(record.name)} name" title="Copy name">${COPY_ICON}</button>
+        <div class="copy-cell-content">
+          <code>${escapeHtml(record.name)}</code>
+          <button class="copy-btn table-copy" type="button" data-copy-index="${index}" data-copy-field="name" aria-label="Copy ${escapeHtml(record.name)} name" title="Copy name">${COPY_ICON}</button>
+        </div>
       </td>
       <td class="copy-cell value-cell">
-        <code>${escapeHtml(record.value)}</code>
-        <button class="copy-btn table-copy" type="button" data-copy-index="${index}" data-copy-field="value" aria-label="Copy ${escapeHtml(record.name)} value" title="Copy value">${COPY_ICON}</button>
+        <div class="copy-cell-content">
+          <code>${escapeHtml(record.value)}</code>
+          <button class="copy-btn table-copy" type="button" data-copy-index="${index}" data-copy-field="value" aria-label="Copy ${escapeHtml(record.name)} value" title="Copy value">${COPY_ICON}</button>
+        </div>
       </td>
     </tr>`;
   }
@@ -464,8 +468,8 @@
         <td><strong>${escapeHtml(row.section)}</strong></td>
         <td>${escapeHtml(row.type)}</td>
         <td>${escapeHtml(row.ttl)}</td>
-        <td class="copy-cell"><code>${escapeHtml(row.name)}</code><button class="copy-btn" type="button" data-copy="${encodedName}" title="Copy name">${COPY_ICON}</button></td>
-        <td class="copy-cell"><code>${escapeHtml(row.value)}</code><button class="copy-btn" type="button" data-copy="${encodedValue}" title="Copy value">${COPY_ICON}</button></td>
+        <td class="copy-cell"><div class="copy-cell-content"><code>${escapeHtml(row.name)}</code><button class="copy-btn" type="button" data-copy="${encodedName}" title="Copy name">${COPY_ICON}</button></div></td>
+        <td class="copy-cell"><div class="copy-cell-content"><code>${escapeHtml(row.value)}</code><button class="copy-btn" type="button" data-copy="${encodedValue}" title="Copy value">${COPY_ICON}</button></div></td>
       </tr>`;
     }).join('');
 
@@ -479,11 +483,13 @@
       .table-wrapper { overflow-x:auto; margin-top:14px; border:1px solid #d9dde6; border-radius:8px; background:#fff; }
       table { width:100%; border-collapse:separate; border-spacing:0; }
       thead { background:#f8fafc; }
-      th, td { padding:12px 10px; border-bottom:1px solid #e5e7eb; text-align:left; vertical-align:top; word-break:break-word; }
+      th, td { padding:12px 10px; border-bottom:1px solid #e5e7eb; text-align:left; vertical-align:middle; word-break:break-word; }
       tbody tr:nth-child(even) { background:#f8fafc; }
       code { font-family:'Segoe UI', sans-serif; font-size:14px; }
-      .copy-cell { display:flex; align-items:flex-start; gap:8px; justify-content:space-between; min-width:170px; }
-      button.copy-btn { background:#4f7fb9; color:#fff; border:1px solid transparent; border-radius:6px; cursor:pointer; min-width:34px; height:34px; display:inline-flex; align-items:center; justify-content:center; }
+      .copy-cell { min-width:170px; }
+      .copy-cell-content { min-height:34px; display:flex; align-items:center; gap:8px; justify-content:space-between; }
+      .copy-cell-content code { min-width:0; }
+      button.copy-btn { background:#77B0DE; color:#fff; border:1px solid transparent; border-radius:6px; cursor:pointer; min-width:34px; height:34px; display:inline-flex; align-items:center; justify-content:center; }
       button.copy-btn:hover { filter:brightness(0.95); }
       button.copy-btn svg { width:16px; height:16px; }
       .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
