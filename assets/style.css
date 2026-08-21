@@ -3,7 +3,7 @@
   --primary: #77B0DE;
   --primary-hover: #5f9ed2;
   --accent: #d84a4a;
-  --success: #4b9b68;
+  --success: #92dba5;
   --bg: #eef2f7;
   --surface: rgba(255, 255, 255, 0.9);
   --surface-solid: #ffffff;
@@ -739,6 +739,11 @@ tbody tr:nth-child(even) {
   background: #f8fafc;
 }
 
+tbody tr.warning-row,
+tbody tr.warning-row:nth-child(even) {
+  background: #fff7df;
+}
+
 tbody tr:last-child td {
   border-bottom: 0;
 }
@@ -775,14 +780,14 @@ tbody tr:last-child td {
   min-width: 0;
   flex: 1 1 auto;
   color: #111827;
-  font-family: "Segoe UI", Arial, sans-serif;
-  font-size: 0.92rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 0.8rem;
   line-height: 1.45;
 }
 
 .value-cell code {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-  font-size: 0.86rem;
+  font-size: 0.8rem;
 }
 
 .results-note {
@@ -805,7 +810,7 @@ button.success {
 }
 
 button.success:hover {
-  background: #3f8759;
+  background: #7ccf95;
 }
 
 .footer {

@@ -262,6 +262,7 @@
       records.forEach(record => {
         rows.push({
           section,
+          needsTenantCheck: section.includes('*'),
           ttl: record.ttl || DEFAULT_TTL,
           type: record.type,
           name: record.name,
@@ -273,7 +274,8 @@
   }
 
   function recordRowHtml(record, index) {
-    return `<tr class="record-row" style="--row-delay:${index * 55}ms">
+    const rowClass = record.needsTenantCheck ? 'record-row warning-row' : 'record-row';
+    return `<tr class="${rowClass}" style="--row-delay:${index * 55}ms">
       <td><strong>${escapeHtml(record.section)}</strong></td>
       <td>${escapeHtml(record.type)}</td>
       <td>${escapeHtml(record.ttl)}</td>
@@ -464,7 +466,8 @@
     const rowsHtml = rows.map((row, index) => {
       const encodedName = encodeURIComponent(row.name);
       const encodedValue = encodeURIComponent(row.value);
-      return `<tr>
+      const rowClass = row.needsTenantCheck ? ' class="warning-row"' : '';
+      return `<tr${rowClass}>
         <td><strong>${escapeHtml(row.section)}</strong></td>
         <td>${escapeHtml(row.type)}</td>
         <td>${escapeHtml(row.ttl)}</td>
@@ -485,7 +488,8 @@
       thead { background:#f8fafc; }
       th, td { padding:12px 10px; border-bottom:1px solid #e5e7eb; text-align:left; vertical-align:middle; word-break:break-word; }
       tbody tr:nth-child(even) { background:#f8fafc; }
-      code { font-family:'Segoe UI', sans-serif; font-size:14px; }
+      tbody tr.warning-row, tbody tr.warning-row:nth-child(even) { background:#fff7df; }
+      code { font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-size:12.5px; }
       .copy-cell { min-width:170px; }
       .copy-cell-content { min-height:34px; display:flex; align-items:center; gap:8px; justify-content:space-between; }
       .copy-cell-content code { min-width:0; }
