@@ -290,8 +290,13 @@
         <div class="results" id="results" tabindex="-1" aria-live="polite"></div>
         <p class="results-note" id="resultsNote" hidden>*Please check this record in your own Microsoft 365 environment, as this may differ.</p>
         <div class="export-wrap">
-          <button id="exportBtn" type="button" class="success" hidden><i class="fa-solid fa-download"></i> Export to HTML</button>
-          <button id="zoneExportBtn" type="button" class="zone-export" hidden><i class="fa-solid fa-file-code"></i> Export Zone file</button>
+          <label class="sr-only" for="exportFormat">Export format</label>
+          <select id="exportFormat" class="export-select" hidden>
+            <option value="html" selected>HTML</option>
+            <option value="zone">Zone</option>
+            <option value="csv">CSV</option>
+          </select>
+          <button id="exportBtn" type="button" class="success" hidden><i class="fa-solid fa-download"></i> Export</button>
         </div>
       </section>
     </main>

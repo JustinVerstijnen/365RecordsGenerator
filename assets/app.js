@@ -38,7 +38,7 @@
 
     generateBtn: document.getElementById('generateBtn'),
     exportBtn: document.getElementById('exportBtn'),
-    zoneExportBtn: document.getElementById('zoneExportBtn'),
+    exportFormat: document.getElementById('exportFormat'),
     results: document.getElementById('results'),
     resultsEmpty: document.getElementById('resultsEmpty'),
     resultsNote: document.getElementById('resultsNote'),
@@ -647,6 +647,61 @@
     URL.revokeObjectURL(url);
   }
 
+  function csvFileName(domain) {
+    const safeDomain = String(domain || 'domain')
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9.-]+/g, '-')
+      .replace(/^-+|-+$/g, '') || 'domain';
+    return `${safeDomain}-dns-records.csv`;
+  }
+
+  function csvCell(value) {
+    const text = String(value ?? '');
+    return `"${text.replace(/"/g, '""')}"`;
+  }
+
+  function exportToCsv(out) {
+    const rows = buildRows(out.records, out.recordOrder);
+    const csvRows = [
+      ['Record', 'Type', 'TTL', 'Name', 'Value', 'Check in tenant'].map(csvCell).join(',')
+    ];
+
+    rows.forEach(row => {
+      csvRows.push([
+        row.section,
+        row.type,
+        row.ttl,
+        row.name,
+        row.value,
+        row.needsTenantCheck ? 'Yes' : 'No'
+      ].map(csvCell).join(','));
+    });
+
+    const blob = new Blob([`\uFEFF${csvRows.join('\r\n')}\r\n`], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = csvFileName(out.customDomain);
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  function exportSelectedFormat(out) {
+    const format = els.exportFormat?.value || 'html';
+    if (format === 'zone') {
+      exportToZone(out);
+      return;
+    }
+    if (format === 'csv') {
+      exportToCsv(out);
+      return;
+    }
+    exportToHtml(out);
+  }
+
   async function handleGenerate() {
     if (!validateAll()) return;
 
@@ -656,14 +711,14 @@
 
     els.generateBtn.disabled = true;
     els.exportBtn.hidden = true;
-    els.zoneExportBtn.hidden = true;
+    els.exportFormat.hidden = true;
     els.resultsNote.hidden = true;
     els.generateBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i>Generating...';
 
     await renderOverviewTable(rows);
 
     els.exportBtn.hidden = false;
-    els.zoneExportBtn.hidden = false;
+    els.exportFormat.hidden = false;
     els.resultsNote.hidden = false;
     els.generateBtn.disabled = false;
     els.generateBtn.innerHTML = '<i class="fas fa-check-circle"></i>Generate records';
@@ -728,15 +783,7 @@
       handleGenerate();
       return;
     }
-    exportToHtml(lastGenerated);
-  });
-
-  els.zoneExportBtn?.addEventListener('click', () => {
-    if (!lastGenerated) {
-      handleGenerate();
-      return;
-    }
-    exportToZone(lastGenerated);
+    exportSelectedFormat(lastGenerated);
   });
 
   try {

@@ -800,9 +800,21 @@ tbody tr:last-child td {
 .export-wrap {
   display: flex;
   justify-content: center;
+  align-items: center;
   gap: 10px;
   flex-wrap: wrap;
   margin-top: 14px;
+}
+
+.export-select {
+  min-width: 150px;
+  height: var(--control-height);
+  padding: 0 38px 0 12px;
+  border: 1px solid #c8cfda;
+  border-radius: 8px;
+  background: #fff;
+  color: var(--text);
+  font-weight: 700;
 }
 
 button.success {
@@ -813,16 +825,6 @@ button.success {
 
 button.success:hover {
   background: #7ccf95;
-}
-
-button.zone-export {
-  background: var(--primary);
-  color: #fff;
-  border-color: transparent;
-}
-
-button.zone-export:hover {
-  background: var(--primary-hover);
 }
 
 .footer {
@@ -933,6 +935,10 @@ button.zone-export:hover {
 
   .learn-more-btn,
   .export-wrap button {
+    width: 100%;
+  }
+
+  .export-select {
     width: 100%;
   }
 
