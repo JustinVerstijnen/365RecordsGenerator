@@ -509,7 +509,7 @@
 <body>
   <div class="container">
     <div class="header">
-      <a href="https://justinverstijnen.nl" target="_blank" rel="noopener noreferrer"><img src="https://justinverstijnen.nl/wp-content/uploads/2025/04/cropped-Logo-2.0-Transparant.png" alt="Justin Verstijnen Logo" /></a>
+      <a href="https://justinverstijnen.nl" target="_blank" rel="noopener noreferrer"><img src="https://sajvwebsiteblobstorage.blob.core.windows.net/blog/tools-2375/logo.svg" alt="Justin Verstijnen Logo" /></a>
       <h1>Microsoft 365 DNS Records Report</h1>
     </div>
     <p class="desc">Generated DNS records for <strong>${escapeHtml(out.customDomain)}</strong> (tenant: <strong>${escapeHtml(out.defaultDomain)}</strong>).</p>

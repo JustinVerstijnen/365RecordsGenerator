@@ -49,8 +49,7 @@
     <main class="container">
       <section class="tool-section" id="domains" data-section="domains" aria-label="Domains">
         <div class="section-heading">
-          <p class="section-kicker">Category 1</p>
-          <h2>Domains</h2>
+          <h2>1. Domains</h2>
         </div>
         <div class="form-grid" role="form" aria-label="Domain inputs">
           <div class="field">
@@ -65,19 +64,18 @@
             <input id="customDomain" type="text" placeholder="yourdomain.com" />
           </div>
         </div>
-        <div class="step-actions">
-          <button class="nav" type="button" data-scroll-next="security">Next <i class="fa-solid fa-arrow-down"></i></button>
+        <div class="section-jump">
+          <button type="button" data-scroll-next="security" aria-label="Go to Security"><i class="fa-solid fa-arrow-down" aria-hidden="true"></i></button>
         </div>
       </section>
 
       <section class="tool-section" id="security" data-section="security" aria-label="Security records">
         <div class="section-heading">
-          <p class="section-kicker">Category 2</p>
-          <h2>Security</h2>
+          <h2>2. Security</h2>
         </div>
 
         <fieldset>
-          <legend>SPF</legend>
+          <legend>2.1 SPF</legend>
           <div class="spf-options" role="radiogroup" aria-label="SPF failure mode">
             <label><input type="radio" name="spfFail" value="hard" checked /> Hard Fail (-all)</label>
             <label><input type="radio" name="spfFail" value="soft" /> Soft Fail (~all)</label>
@@ -85,7 +83,7 @@
         </fieldset>
 
         <fieldset>
-          <legend>DMARC</legend>
+          <legend>2.2 DMARC</legend>
           <div class="field">
             <label for="dmarcPolicy">DMARC Policy</label>
             <select id="dmarcPolicy" name="dmarcPolicy" aria-label="DMARC Policy">
@@ -154,7 +152,7 @@
         </fieldset>
 
         <fieldset>
-          <legend>SMTP DANE</legend>
+          <legend>2.3 SMTP DANE</legend>
           <p class="section-help">Use the following PowerShell commands to enable DNSSEC and SMTP DANE for your verified domain.</p>
 
           <div class="field command-field">
@@ -181,7 +179,7 @@
         </fieldset>
 
         <fieldset>
-          <legend>MTA-STS</legend>
+          <legend>2.4 MTA-STS</legend>
           <div class="field">
             <label class="checkbox">
               <input id="mtaStsEnabled" type="checkbox" />
@@ -205,15 +203,14 @@
             <span class="icon" aria-hidden="true"><i class="fa-solid fa-book"></i></span>Learn more
           </a>
         </div>
-        <div class="step-actions">
-          <button class="nav" type="button" data-scroll-next="monitoring">Next <i class="fa-solid fa-arrow-down"></i></button>
+        <div class="section-jump">
+          <button type="button" data-scroll-next="monitoring" aria-label="Go to Monitoring"><i class="fa-solid fa-arrow-down" aria-hidden="true"></i></button>
         </div>
       </section>
 
       <section class="tool-section" id="monitoring" data-section="monitoring" aria-label="Monitoring records">
         <div class="section-heading">
-          <p class="section-kicker">Category 3</p>
-          <h2>Monitoring</h2>
+          <h2>3. Monitoring</h2>
         </div>
 
         <fieldset>
@@ -230,15 +227,14 @@
           </div>
         </fieldset>
 
-        <div class="step-actions">
-          <button class="nav" type="button" data-scroll-next="microsoft-services">Next <i class="fa-solid fa-arrow-down"></i></button>
+        <div class="section-jump">
+          <button type="button" data-scroll-next="microsoft-services" aria-label="Go to Microsoft Services"><i class="fa-solid fa-arrow-down" aria-hidden="true"></i></button>
         </div>
       </section>
 
       <section class="tool-section" id="microsoft-services" data-section="microsoft-services" aria-label="Microsoft service records">
         <div class="section-heading">
-          <p class="section-kicker">Category 4</p>
-          <h2>Microsoft Services</h2>
+          <h2>4. Microsoft Services</h2>
         </div>
 
         <fieldset class="service-records">
@@ -266,12 +262,14 @@
         <div class="step-actions generate-actions">
           <button id="generateBtn" type="button"><i class="fas fa-check-circle"></i>Generate records</button>
         </div>
+        <div class="section-jump">
+          <button type="button" data-scroll-next="results-section" aria-label="Go to Results"><i class="fa-solid fa-arrow-down" aria-hidden="true"></i></button>
+        </div>
       </section>
 
       <section class="tool-section results-section" id="results-section" data-section="results-section" aria-label="Generated DNS records">
         <div class="section-heading">
-          <p class="section-kicker">Category 5</p>
-          <h2>Results</h2>
+          <h2>5. Results</h2>
         </div>
         <div class="results-empty" id="resultsEmpty">
           <i class="fa-solid fa-table-list" aria-hidden="true"></i>

@@ -205,8 +205,9 @@ h1 {
 }
 
 .tool-section {
+  position: relative;
   min-height: 340px;
-  padding: 30px;
+  padding: 30px 30px 38px;
   scroll-margin-top: 106px;
   border-bottom: 1px solid rgba(217, 221, 230, 0.85);
 }
@@ -217,15 +218,6 @@ h1 {
 
 .section-heading {
   margin-bottom: 18px;
-}
-
-.section-kicker {
-  margin: 0 0 5px;
-  color: var(--primary);
-  font-size: 0.78rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0;
 }
 
 h2 {
@@ -452,6 +444,35 @@ details.customize[open] > summary::after {
 
 .step-actions button {
   margin: 0;
+}
+
+.section-jump {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  z-index: 2;
+  transform: translate(-50%, 50%);
+}
+
+.section-jump button {
+  width: 30px;
+  min-width: 30px;
+  height: 30px;
+  min-height: 30px;
+  padding: 0;
+  border-radius: 999px;
+  background: var(--primary);
+  color: #fff;
+  border: 2px solid rgba(244, 246, 250, 0.98);
+  box-shadow: 0 5px 14px rgba(17, 24, 39, 0.14);
+}
+
+.section-jump button:hover {
+  background: var(--primary-hover);
+}
+
+.section-jump i {
+  font-size: 12px;
 }
 
 button.nav,
@@ -826,7 +847,7 @@ button.success:hover {
   }
 
   .tool-section {
-    padding: 24px 16px;
+    padding: 24px 16px 36px;
   }
 
   .input-suffix-wrapper {
@@ -845,13 +866,11 @@ button.success:hover {
   }
 
   .learn-more-wrap,
-  .step-actions,
   .export-wrap {
     justify-content: stretch;
   }
 
   .learn-more-btn,
-  .step-actions button,
   .export-wrap button {
     width: 100%;
   }
