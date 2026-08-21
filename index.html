@@ -221,7 +221,10 @@
         </div>
 
         <fieldset>
-          <legend>SMTP-TLS</legend>
+          <legend class="legend-row">
+            <span>SMTP-TLS</span>
+            <a class="doc-link" href="https://justinverstijnen.nl/what-is-tls-rpt/" target="_blank" rel="noopener noreferrer" aria-label="Learn more about SMTP-TLS"><i class="fa-solid fa-book" aria-hidden="true"></i> Learn more</a>
+          </legend>
           <div class="field">
             <label class="checkbox">
               <input id="tlsRptEnabled" type="checkbox" />
@@ -250,10 +253,11 @@
             <label class="checkbox service-toggle">
               <input id="includeW365Avd" type="checkbox" />
               <span>
-                <strong>Record W365/AVD</strong>
+                <strong>Record AVD/W365</strong>
                 <small>Add the Windows 365 / Azure Virtual Desktop feed discovery TXT record.</small>
               </span>
             </label>
+            <a class="doc-link service-doc" href="https://justinverstijnen.nl/automatic-avd-w365-feed-discovery-for-mobile-apps/" target="_blank" rel="noopener noreferrer" aria-label="Learn more about AVD and W365 feed discovery"><i class="fa-solid fa-book" aria-hidden="true"></i> Learn more</a>
           </div>
           <div class="service-choice">
             <label class="checkbox service-toggle">
@@ -263,6 +267,7 @@
                 <small>Add the Enterprise Enrollment and Enterprise Registration CNAME records.</small>
               </span>
             </label>
+            <a class="doc-link service-doc" href="https://justinverstijnen.nl/configuring-intune-enrollment-dns-records-nonsense-or-required/" target="_blank" rel="noopener noreferrer" aria-label="Learn more about Intune enrollment DNS records"><i class="fa-solid fa-book" aria-hidden="true"></i> Learn more</a>
           </div>
         </fieldset>
 

@@ -385,6 +385,10 @@ legend.legend-row {
 }
 
 .service-choice {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
   padding: 12px 0;
   border-top: 1px solid rgba(217, 221, 230, 0.85);
 }
@@ -400,6 +404,7 @@ legend.legend-row {
 
 .service-toggle {
   align-items: flex-start;
+  flex: 1 1 auto;
 }
 
 .service-toggle span {
@@ -411,6 +416,10 @@ legend.legend-row {
   color: var(--muted);
   font-weight: 500;
   line-height: 1.4;
+}
+
+.service-doc {
+  flex: 0 0 auto;
 }
 
 .is-disabled {
@@ -908,6 +917,15 @@ button.success:hover {
   .learn-more-btn,
   .export-wrap button {
     width: 100%;
+  }
+
+  .service-choice {
+    display: grid;
+    gap: 10px;
+  }
+
+  .service-doc {
+    width: fit-content;
   }
 
   .generate-animation {
