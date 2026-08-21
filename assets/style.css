@@ -800,6 +800,8 @@ tbody tr:last-child td {
 .export-wrap {
   display: flex;
   justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
   margin-top: 14px;
 }
 
@@ -811,6 +813,16 @@ button.success {
 
 button.success:hover {
   background: #7ccf95;
+}
+
+button.zone-export {
+  background: var(--primary);
+  color: #fff;
+  border-color: transparent;
+}
+
+button.zone-export:hover {
+  background: var(--primary-hover);
 }
 
 .footer {
