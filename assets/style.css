@@ -1,7 +1,7 @@
 :root {
   --control-height: 44px;
-  --primary: #4f7fb9;
-  --primary-hover: #416fa5;
+  --primary: #77B0DE;
+  --primary-hover: #5f9ed2;
   --accent: #d84a4a;
   --success: #4b9b68;
   --bg: #eef2f7;
@@ -95,6 +95,11 @@ button:disabled {
   justify-content: center;
   gap: 10px;
   margin-bottom: 16px;
+  padding: 24px 20px;
+  background: rgba(229, 231, 235, 0.92);
+  border: 1px solid rgba(209, 213, 219, 0.88);
+  border-radius: 8px;
+  box-shadow: 0 10px 28px rgba(17, 24, 39, 0.1);
   text-align: center;
 }
 
